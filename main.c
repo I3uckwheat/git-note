@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
 
     if(command == -1) {
         show_help();
-        return 1;
+        return 0;
     }
 
     switch(command) {
@@ -54,7 +54,6 @@ int main(int argc, char *argv[]) {
             break;
         default:
             printf("Error\n no command found");
+            return 1;
     }
-
-    printf("Welcome to git-note!\n");
 }
