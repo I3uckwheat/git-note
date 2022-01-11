@@ -1,12 +1,12 @@
 #OBJS specifies which files to compile as part of the project
-OBJS = main.c 
+OBJS = main.c add.c
 
 #CC specifies our compiler
 CC = gcc
 
 # COMPILER_FLAGS = -w -g
 
-# LINKER_FLAGS = -lSDL2 -I./ -I./Pieces/ -I./Board/
+LINKER_FLAGS = -I./ 
 
 #OBJ_NAME specifies the name of our executable
 OBJ_NAME = git-note

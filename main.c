@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <getopt.h>
 #include <string.h>
+#include <./add.h>
 
 struct command {
     char* name;
@@ -48,6 +49,8 @@ int main(int argc, char *argv[]) {
 
     switch(command) {
         case 'a':
+            add(argc, argv); // arg 2 is the note to add
+            break;
         case 'c':
         case 'r':
             printf("Not Implemented\n");
