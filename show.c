@@ -12,6 +12,5 @@ int show(int argc, char *argv[]) {
     while(fgets(fileLineBuffer, sizeof(fileLineBuffer), noteFile) != NULL) {
         printf("%s", fileLineBuffer);
     };
-    printf("\n");
     return 0;
 }
