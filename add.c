@@ -7,6 +7,8 @@
 
 int add(int argc, char *argv[]) {
     char *message = argv[2];
+    if(message == NULL) return 0;
+
     FILE* noteFile = open_notes_file("a");
 
     // Failing to open the file, is likely due to a missing directory
