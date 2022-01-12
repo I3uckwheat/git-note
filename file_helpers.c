@@ -7,6 +7,7 @@
 #include <./file_helpers.h>
 #include <./git_helpers.h>
 
+//TODO: find a way to use 4096 more implicitly through a macro
 int get_note_directory(char *buffer, size_t bufferSize) {
     char projectDirName[256];
     get_dir_name(projectDirName, sizeof(projectDirName));
@@ -14,7 +15,7 @@ int get_note_directory(char *buffer, size_t bufferSize) {
     snprintf(buffer, bufferSize, "%s/%s/%s", getenv("HOME"), ".notes", projectDirName);
 }
 
-FILE *open_notes_file(char *mode) {
+int get_note_path(char *buffer, size_t bufferSize) {
     // Git branch lengths are limited to 255 characters
     char branchName[256];
     get_branch_name(branchName, sizeof(branchName));
@@ -22,9 +23,13 @@ FILE *open_notes_file(char *mode) {
     char noteDirectoryPath[4096 - 256];
     get_note_directory(noteDirectoryPath, sizeof(noteDirectoryPath));
 
-    char noteFilePath[4096];
-    snprintf(noteFilePath, sizeof(noteFilePath), "%s/%s", noteDirectoryPath, branchName);
+    snprintf(buffer, bufferSize, "%s/%s", noteDirectoryPath, branchName);
+    return 0;
+}
 
+FILE *open_notes_file(char *mode) {
+    char noteFilePath[4096];
+    get_note_path(noteFilePath, sizeof(noteFilePath));
     return fopen(noteFilePath, mode);
 }
 
