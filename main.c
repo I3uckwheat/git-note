@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <getopt.h>
 #include <string.h>
+
 #include <./add.h>
+#include <./show.h>
 
 struct command {
     char* name;
@@ -9,6 +11,7 @@ struct command {
 };
 
 static const struct command const commands[] = {
+    {"show", 's'},
     {"add", 'a'},
     {"complete", 'c'},
     {"remove", 'r'},
@@ -21,6 +24,11 @@ void show_help() {
 
 // Returns -1 if invalid, commandFlag if valid
 char parse_command(int count, char *command) {
+    // If only one command is sent we have to assume the user wants to show the notes 
+    if(count == 1) { 
+        return 's';
+    }
+
     if(count < 2) {
         return -1;
     }
@@ -29,7 +37,7 @@ char parse_command(int count, char *command) {
         char commandFlag = commands[i].commandFlag;
 
         if(
-            strcmp(command, commands[i].name) == 0 ||
+            strncmp(command, commands[i].name, 10) == 0 ||
             (strlen(command) == 1 && command[0] == commandFlag)
         ) {
             return commandFlag;
@@ -50,6 +58,9 @@ int main(int argc, char *argv[]) {
     switch(command) {
         case 'a':
             add(argc, argv); // arg 2 is the note to add
+            break;
+        case 's':
+            show(argc, argv);
             break;
         case 'c':
         case 'r':
