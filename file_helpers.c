@@ -1,42 +1,50 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/stat.h>
-#include <errno.h>
 #include <string.h>
+#include <errno.h>
 
 #include <./file_helpers.h>
 #include <./git_helpers.h>
 
+int get_note_directory(char *buffer, size_t bufferSize) {
+    char projectDirName[256];
+    get_dir_name(projectDirName, sizeof(projectDirName));
+
+    snprintf(buffer, bufferSize, "%s/%s/%s", getenv("HOME"), ".notes", projectDirName);
+}
+
 FILE *open_notes_file(char *mode) {
     // Git branch lengths are limited to 255 characters
     char branchName[256];
-    get_branch_name(branchName, 256);
+    get_branch_name(branchName, sizeof(branchName));
 
-    // 256 reserved for git branch and \0
-    char noteDirPath[4096 - 256];
-    // TODO: Add project name
-    snprintf(noteDirPath, sizeof(noteDirPath), "%s/%s", getenv("HOME"), ".notes");
+    char noteDirectoryPath[4096 - 256];
+    get_note_directory(noteDirectoryPath, sizeof(noteDirectoryPath));
 
-    char notePath[4096];
-    snprintf(notePath, sizeof(notePath), "%s/%s", noteDirPath, branchName);
+    char noteFilePath[4096];
+    snprintf(noteFilePath, sizeof(noteFilePath), "%s/%s", noteDirectoryPath, branchName);
 
-    FILE *note = fopen(notePath, mode);
-    // Failing to open the file, is likely due to a missing directory
-    if (note == NULL && errno == ENOENT) {
-        if (mkdir(noteDirPath, 0775) != 0) {
-            printf("Failed to create note path\n");
-            exit(1);
-        }
-
-        // Recurse to attempt to open file again
-        return open_notes_file(mode);
-    } else if (note == NULL) {
-        printf("%s: Failed to open notes file\n", strerror(errno));
-    }
-
-    return note;
+    return fopen(noteFilePath, mode);
 }
 
-void close_notes_file(FILE *noteFile) {
-	fclose(noteFile);
+int close_notes_file(FILE *noteFile) {
+	return fclose(noteFile);
+}
+
+int create_note_dir_structure() {
+    char main_note_directory[4096];
+    snprintf(main_note_directory, sizeof(main_note_directory), "%s/%s", getenv("HOME"), ".notes");
+
+    struct stat statBuffer;
+    if(stat(main_note_directory, &statBuffer) != 0) {
+        if(mkdir(main_note_directory, 0755) != 0) {
+            printf("%s: Unable to setup .notes directory", strerror(errno));
+        }
+    }
+
+    char noteDirectoryPath[4096 - 256];
+    get_note_directory(noteDirectoryPath, sizeof(noteDirectoryPath));
+
+    return mkdir(noteDirectoryPath, 0775);
 }
