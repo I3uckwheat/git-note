@@ -1,1 +1,3 @@
-void add(int argc, char *argv[]);
+#pragma once
+
+int add(int argc, char *argv[]);

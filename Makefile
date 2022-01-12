@@ -1,5 +1,5 @@
 #OBJS specifies which files to compile as part of the project
-OBJS = main.c add.c
+OBJS = main.c add.c file_helpers.c git_helpers.c
 
 #CC specifies our compiler
 CC = gcc
