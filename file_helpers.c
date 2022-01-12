@@ -13,6 +13,7 @@ int get_note_directory(char *buffer, size_t bufferSize) {
     get_dir_name(projectDirName, sizeof(projectDirName));
 
     snprintf(buffer, bufferSize, "%s/%s/%s", getenv("HOME"), ".notes", projectDirName);
+    return 0;
 }
 
 int get_note_path(char *buffer, size_t bufferSize) {

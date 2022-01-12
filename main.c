@@ -10,7 +10,7 @@ struct command {
     char commandFlag;
 };
 
-static const struct command const commands[] = {
+static const struct command commands[] = {
     {"show", 's'},
     {"add", 'a'},
     {"complete", 'c'},
