@@ -33,3 +33,18 @@ int get_dir_name(char *buffer, size_t bufferSize) {
     strncpy(buffer, strrchr(buffer, '/') + 1, bufferSize); // Move the substring to the front of the buffer
     return 0;
 }
+
+int get_configured_editor_path(char *buffer, size_t bufferSize) {
+    FILE *fp;
+    fp = popen("whereis $(git config --get core.editor)", "r");
+    if(fp == NULL) {
+        printf("Failed to access git");
+        return 1;
+    }
+
+    while(fgets(buffer, bufferSize, fp) != NULL);
+    buffer[strcspn(buffer, "\n")] = 0; // Removes the newline returned from the git command
+
+    pclose(fp);
+    return 0;
+}
