@@ -1,10 +1,10 @@
 #OBJS specifies which files to compile as part of the project
-OBJS = main.c add.c file_helpers.c git_helpers.c show.c
+OBJS = main.c add.c file_helpers.c git_helpers.c show.c complete.c
 
 #CC specifies our compiler
 CC = gcc
 
-# COMPILER_FLAGS = -w -g
+COMPILER_FLAGS = -Wall
 
 LINKER_FLAGS = -I./ 
 
