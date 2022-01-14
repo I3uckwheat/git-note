@@ -4,21 +4,22 @@
 #include <./complete.h>
 #include <./file_helpers.h>
 
-int read_file_into_memory(char *buffer, FILE *noteFile) {
+int read_file_into_memory(char **notes, FILE *noteFile) {
     size_t chunkSize = 500;
     size_t chunks = 1;
     size_t charactersRead = 0;
     char *temp_notes;
-    char *notes = malloc(sizeof(char) * chunkSize + 1);
-    if(notes == NULL) {
+    *notes = malloc(sizeof(char) * chunkSize + 1);
+    if(*notes == NULL) {
         printf("Failed to complete note");
         exit(1);
     }
 
     while(1) {
-        size_t read = fread(notes + charactersRead, sizeof(char), chunkSize, noteFile);
+        size_t read = fread(*notes + charactersRead, sizeof(char), chunkSize, noteFile);
         if(read < chunkSize) {
             if(feof(noteFile)) {
+                charactersRead += read;
                 break;
             } else if (ferror(noteFile)) {
                 printf("There was an error loading the note file\n");
@@ -29,16 +30,16 @@ int read_file_into_memory(char *buffer, FILE *noteFile) {
         chunks++;
         charactersRead += read;
 
-        temp_notes = realloc(notes, chunkSize * chunks);
+        temp_notes = realloc(*notes, chunkSize * chunks);
         if(temp_notes == NULL) {
             printf("Failed to allocate memory\n");
             exit(1);
         }
 
-        notes = temp_notes;
+        *notes = temp_notes;
     } 
 
-    buffer = notes;
+    printf("Notes:\n%s\n\n", *notes);
     return charactersRead;
 }
 
@@ -50,28 +51,23 @@ int complete(int argc, char *argv[]) {
 
     int completedLine = atoi(argv[2]);
 
-    FILE* noteFile = open_notes_file("r");
+    FILE* noteFile = open_notes_file("r+");
     if(noteFile == NULL) {
         printf("No notes exist for the current branch\n");
         return 1;
     }
 
-    char *notes = {0};
-    int characterCount = read_file_into_memory(notes, noteFile);
-    close_notes_file(noteFile);
+    char *notes = NULL;
+    int characterCount = read_file_into_memory(&notes, noteFile);
+    printf("lines: %d | Notes: %s", characterCount, notes);
 
-    FILE* noteFile = open_notes_file("w");
-    if(noteFile == NULL) {
-        printf("Failed to open notes for writing\n");
-        return 1;
-    }
-
-    int lines;
-    while(1) {
+    // int lines;
+    // while(1) {
         // write line to file
         // after x lines, make complete
-    }
+    // }
 
+    close_notes_file(noteFile);
     free(notes);
     return 0;
 }
