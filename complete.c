@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h> 
+#include <string.h>
 
 #include <./complete.h>
 #include <./file_helpers.h>
@@ -39,7 +40,6 @@ int read_file_into_memory(char **notes, FILE *noteFile) {
         *notes = temp_notes;
     } 
 
-    printf("Notes:\n%s\n\n", *notes);
     return charactersRead;
 }
 
@@ -61,11 +61,44 @@ int complete(int argc, char *argv[]) {
     int characterCount = read_file_into_memory(&notes, noteFile);
     printf("lines: %d | Notes: %s", characterCount, notes);
 
-    // int lines;
-    // while(1) {
-        // write line to file
-        // after x lines, make complete
-    // }
+
+    // Why is notes NULL
+    printf("notes: %s\n\n", notes);
+
+    char *lineStart = notes;
+    char *lineEnd = NULL;
+    int lineCounter = 0;
+    while(1) {
+        // Find the end of a line
+        lineEnd = strchr(lineStart, '\n');
+
+        // If NULL is returned, write the rest of the string, no more lines follow
+        // if(lineEnd == NULL) {
+        //     fputs(lineStart, noteFile);
+        //     break;
+        // } 
+
+    //     // Put completed token
+    //     // TODO: Check if already completed
+    //     if(lineCounter == completedLine) {
+    //         fputs("WOOH - ", noteFile);
+    //     }
+
+    //     // Write characters for the line between the start of the line, and the next \n
+    //     int charCounter = 0;
+    //     while(1) {
+    //         int result = fputc(lineStart[charCounter], noteFile);
+    //         if(result != lineStart[charCounter]) { // FIXME: use proper EOF
+    //           printf("Failed to write to file\n"); // FIXME: prevent loss of whole file (use dupe)
+    //         }
+
+    //         charCounter++;
+    //     }
+
+        lineStart = lineEnd;
+        lineEnd = NULL;
+        lineCounter++;
+    }
 
     close_notes_file(noteFile);
     free(notes);
