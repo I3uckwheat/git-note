@@ -7,6 +7,7 @@
 #include <./file_helpers.h>
 #include <./git_helpers.h>
 
+// TODO: Move to edit command
 int open_editor() {
     char note_path[4096];
     get_note_path(note_path, sizeof(note_path));

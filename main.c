@@ -4,6 +4,7 @@
 
 #include <./add.h>
 #include <./show.h>
+#include <./complete.h>
 
 struct command {
     char* name;
@@ -63,6 +64,8 @@ int main(int argc, char *argv[]) {
             show(argc, argv);
             break;
         case 'c':
+            complete(argc, argv);
+            break;
         case 'r':
             printf("Not Implemented\n");
             break;
