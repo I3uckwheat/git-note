@@ -14,6 +14,13 @@ int get_branch_name(char *buffer, size_t bufferSize) {
     while(fgets(buffer, bufferSize, fp) != NULL);
     buffer[strcspn(buffer, "\n")] = 0; // Removes the newline returned from the git command
 
+    // Converts all '/' into another delimiter
+    int i = 0;
+    while(buffer[i] != '\0' || i != bufferSize) {
+        if(buffer[i] == '/') buffer[i] = ':';
+        i++;
+    }
+
     pclose(fp);
     return 0;
 }
