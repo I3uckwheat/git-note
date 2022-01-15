@@ -92,7 +92,6 @@ int complete(int argc, char *argv[]) {
         } 
 
         // Put completed token
-        // TODO: Check if already completed
         if(lineCounter == completedLine - 1) {
             if(strstr(lineStart, "[x]") != lineStart) {
                 char *checkboxStart = strstr(lineStart, "[ ]");

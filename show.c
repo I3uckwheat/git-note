@@ -8,6 +8,7 @@ int show(int argc, char *argv[]) {
         return 1;
     }
 
+    // TODO: If not formatted correctly, fix and update
     int line = 1;
     char fileLineBuffer[1000];
     while(fgets(fileLineBuffer, sizeof(fileLineBuffer), noteFile) != NULL) {
