@@ -8,9 +8,11 @@ int show(int argc, char *argv[]) {
         return 1;
     }
 
+    int line = 1;
     char fileLineBuffer[1000];
     while(fgets(fileLineBuffer, sizeof(fileLineBuffer), noteFile) != NULL) {
-        printf("%s", fileLineBuffer);
+        printf("%d | %s", line, fileLineBuffer);
+        line++;
     };
     close_notes_file(noteFile);
     return 0;
