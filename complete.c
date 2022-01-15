@@ -43,6 +43,23 @@ int read_file_into_memory(char **notes, FILE *noteFile) {
     return charactersRead;
 }
 
+char * write_to_delimiter(char *lineStart, char delim, FILE *dest) {
+    // Write characters for the line between the start of the line, and the next \n
+    int charCounter = 0;
+    while(1) {
+        int result = fputc(lineStart[charCounter], dest);
+        if(result != lineStart[charCounter]) { // FIXME: use proper EOF
+            printf("Failed to write to file\n"); // FIXME: prevent loss of whole file (use dupe)
+            return 0;
+        }
+
+        if(lineStart[charCounter] == delim) break;
+        charCounter++;
+    }
+
+    return lineStart + charCounter + 1;
+}
+
 int complete(int argc, char *argv[]) {
     if(argc < 3) {
         printf("Not enough arguments to 'complete' command\n");
@@ -75,28 +92,21 @@ int complete(int argc, char *argv[]) {
         } 
 
         // Put completed token
-        // TODO: Check if already completed
         if(lineCounter == completedLine - 1) {
-            fputs("done: ", noteFile);
+            if(strstr(lineStart, "[x]") != lineStart) {
+                char *checkboxStart = strstr(lineStart, "[ ]");
+                if(checkboxStart == NULL) {
+                    fputs("[x] | ", noteFile);
+                } else {
+                    checkboxStart[1] = 'x';
+                }
+            } else {
+                char *checkboxStart = strstr(lineStart, "[x]");
+                checkboxStart[1] = ' ';
+            }
         }
 
-        // Write characters for the line between the start of the line, and the next \n
-        int charCounter = 0;
-        do {
-            int result = fputc(lineStart[charCounter], noteFile);
-            if(result != lineStart[charCounter]) { // FIXME: use proper EOF
-              printf("Failed to write to file\n"); // FIXME: prevent loss of whole file (use dupe)
-              close_notes_file(noteFile);
-              free(notes);
-              return 0;
-            }
-
-            charCounter++;
-
-        } while(&lineStart[charCounter] != lineEnd + 1); // TODO: Test if there is no newline
-
-        lineStart = lineEnd + 1;
-        lineEnd = NULL;
+        lineStart = write_to_delimiter(lineStart, '\n', noteFile);
         lineCounter++;
     }
 
