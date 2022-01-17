@@ -2,9 +2,12 @@
 #include <getopt.h>
 #include <string.h>
 
+#include <stdlib.h>
+
 #include <./add.h>
 #include <./show.h>
 #include <./complete.h>
+#include <./note.h>
 
 struct command {
     char* name;
@@ -49,6 +52,14 @@ char parse_command(int count, char *command) {
 }
 
 int main(int argc, char *argv[]) {
+    // char* noteLineStart = "[ ] | hello world\n";
+    // size_t noteSize = 19;
+
+    // Note *test = new_note(noteLineStart, noteSize);
+    // printf("Note: %s\n\n", test->body);
+    // exit(0);
+    // return 0;
+
     char command = parse_command(argc, argv[1]);
 
     if(command == -1) {

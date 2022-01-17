@@ -4,44 +4,7 @@
 
 #include <./complete.h>
 #include <./file_helpers.h>
-
-int read_file_into_memory(char **notes, FILE *noteFile) {
-    size_t chunkSize = 500;
-    size_t chunks = 1;
-    size_t charactersRead = 0;
-    char *temp_notes;
-    *notes = malloc(sizeof(char) * chunkSize + 1);
-    if(*notes == NULL) {
-        printf("Failed to complete note");
-        exit(1);
-    }
-
-    while(1) {
-        size_t read = fread(*notes + charactersRead, sizeof(char), chunkSize, noteFile);
-        if(read < chunkSize) {
-            if(feof(noteFile)) {
-                charactersRead += read;
-                break;
-            } else if (ferror(noteFile)) {
-                printf("There was an error loading the note file\n");
-                exit(1);
-            }
-        }
-
-        chunks++;
-        charactersRead += read;
-
-        temp_notes = realloc(*notes, chunkSize * chunks);
-        if(temp_notes == NULL) {
-            printf("Failed to allocate memory\n");
-            exit(1);
-        }
-
-        *notes = temp_notes;
-    } 
-
-    return charactersRead;
-}
+#include <./note.h>
 
 char * write_to_delimiter(char *lineStart, char delim, FILE *dest) {
     // Write characters for the line between the start of the line, and the next \n
@@ -66,7 +29,7 @@ int complete(int argc, char *argv[]) {
         exit(1);
     }
 
-    int completedLine = atoi(argv[2]);
+    int completedLine = atoi(argv[2]) - 1;
 
     FILE* noteFile = open_notes_file("r+");
     if(noteFile == NULL) {
@@ -74,43 +37,37 @@ int complete(int argc, char *argv[]) {
         return 1;
     }
 
-    char *notes = NULL;
-    int characterCount = read_file_into_memory(&notes, noteFile);
+    NoteContainer *noteContainer = parse_notes(noteFile);
+    if(noteContainer == NULL) {
+        printf("Failed to parse notes\n");
+        free(noteFile);
+        exit(1);
+    }
+
+    if(noteContainer->size < completedLine && completedLine > 0) return 0;
+    if(noteContainer->notes[completedLine]->isComplete == 1) {
+        noteContainer->notes[completedLine]->isComplete = 0;
+    } else {
+        noteContainer->notes[completedLine]->isComplete = 1;
+    }
+
     rewind(noteFile);
 
-    char *lineStart = notes;
-    char *lineEnd = NULL;
-    int lineCounter = 0;
-    while(1) {
-        // Find the end of a line
-        lineEnd = strchr(lineStart + 1, '\n');
+    for(int i = 0; i < noteContainer->size - 1; i++) {
+        Note * currentNote = noteContainer->notes[i];
+        printf("currentNote: %s, isComplete: %d, i: %d\n", currentNote->body, currentNote->isComplete, i);
 
-        // If NULL is returned, write the rest of the string, no more lines follow
-        if(lineEnd == NULL) {
-            fputs(&lineStart[characterCount], noteFile);
-            break;
-        } 
-
-        // Put completed token
-        if(lineCounter == completedLine - 1) {
-            if(strstr(lineStart, "[x]") != lineStart) {
-                char *checkboxStart = strstr(lineStart, "[ ]");
-                if(checkboxStart == NULL) {
-                    fputs("[x] | ", noteFile);
-                } else {
-                    checkboxStart[1] = 'x';
-                }
-            } else {
-                char *checkboxStart = strstr(lineStart, "[x]");
-                checkboxStart[1] = ' ';
-            }
+        if(currentNote->isComplete == 1) {
+            fputs("[x] |", noteFile);
+        } else {
+            fputs("[ ] |", noteFile);
         }
 
-        lineStart = write_to_delimiter(lineStart, '\n', noteFile);
-        lineCounter++;
+        fputs(currentNote->body, noteFile);
+        fputs("\n", noteFile);
     }
 
     close_notes_file(noteFile);
-    free(notes);
+    delete_notes(noteContainer);
     return 0;
 }
