@@ -6,6 +6,23 @@
 #include <./file_helpers.h>
 #include <./note.h>
 
+char * write_to_delimiter(char *lineStart, char delim, FILE *dest) {
+    // Write characters for the line between the start of the line, and the next \n
+    int charCounter = 0;
+    while(1) {
+        int result = fputc(lineStart[charCounter], dest);
+        if(result != lineStart[charCounter]) { // FIXME: use proper EOF
+            printf("Failed to write to file\n"); // FIXME: prevent loss of whole file (use dupe)
+            return 0;
+        }
+
+        if(lineStart[charCounter] == delim) break;
+        charCounter++;
+    }
+
+    return lineStart + charCounter + 1;
+}
+
 int complete(int argc, char *argv[]) {
     if(argc < 3) {
         printf("Not enough arguments to 'complete' command\n");
