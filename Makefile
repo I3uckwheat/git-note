@@ -4,7 +4,7 @@ OBJS = main.c add.c file_helpers.c git_helpers.c show.c complete.c note.c
 #CC specifies our compiler
 CC = gcc
 
-COMPILER_FLAGS = -Wall -g
+COMPILER_FLAGS = -Wall
 
 LINKER_FLAGS = -I./ 
 
