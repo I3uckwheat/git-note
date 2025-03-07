@@ -4,10 +4,10 @@
 
 #include <stdlib.h>
 
-#include <./add.h>
-#include <./show.h>
-#include <./complete.h>
-#include <./note.h>
+#include <./src/add.h>
+#include <./src/show.h>
+#include <./src/complete.h>
+#include <./src/note.h>
 
 struct command {
     char* name;

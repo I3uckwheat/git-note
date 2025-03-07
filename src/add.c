@@ -4,8 +4,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <./file_helpers.h>
-#include <./git_helpers.h>
+#include <./src/file_helpers.h>
+#include <./src/git_helpers.h>
 
 // TODO: Move to edit command
 int open_editor() {

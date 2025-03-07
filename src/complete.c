@@ -2,9 +2,9 @@
 #include <stdlib.h> 
 #include <string.h>
 
-#include <./complete.h>
-#include <./file_helpers.h>
-#include <./note.h>
+#include <./src/complete.h>
+#include <./src/file_helpers.h>
+#include <./src/note.h>
 
 char * write_to_delimiter(char *lineStart, char delim, FILE *dest) {
     // Write characters for the line between the start of the line, and the next \n

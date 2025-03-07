@@ -1,5 +1,5 @@
-#include <./show.h>
-#include <./file_helpers.h>
+#include <./src/show.h>
+#include <./src/file_helpers.h>
 
 int show(int argc, char *argv[]) {
     FILE* noteFile = open_notes_file("r");
