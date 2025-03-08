@@ -5,7 +5,7 @@
 #include <errno.h>
 
 #include "file_helpers.h"
-#include "./git_helpers.h"
+#include "git_helpers.h"
 
 //TODO: find a way to use 4096 more implicitly through a macro
 int get_note_directory(char *buffer, size_t bufferSize) {
@@ -55,7 +55,7 @@ int create_note_dir_structure() {
     return mkdir(noteDirectoryPath, 0775);
 }
 
-char * read_file_into_memory(FILE *noteFile) {
+char *read_file_into_memory(FILE *noteFile) {
     size_t chunkSize = 500;
     size_t chunks = 1;
     size_t charactersRead = 0;
