@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <./src/git_helpers.h>
+#include "git_helpers.h"
 
 int get_branch_name(char *buffer, size_t bufferSize) {
     FILE *fp;

@@ -4,8 +4,8 @@
 #include <string.h>
 #include <errno.h>
 
-#include <./src/file_helpers.h>
-#include <./src/git_helpers.h>
+#include "file_helpers.h"
+#include "./git_helpers.h"
 
 //TODO: find a way to use 4096 more implicitly through a macro
 int get_note_directory(char *buffer, size_t bufferSize) {

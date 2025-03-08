@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <./src/note.h>
-#include <./src/file_helpers.h>
+
+#include "note.h"
+#include "file_helpers.h"
 
 Note * new_note(char *noteLineStart, size_t noteSize) {
     Note *newNote = malloc(sizeof(Note));
