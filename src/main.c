@@ -74,6 +74,8 @@ int main(int argc, char *argv[]) {
     char* serialized = HashNote__serialize_table(table);
 
     printf("%s", serialized);
+    free(serialized);
+    HashNote__free_table(table);
 
     // HashNote_Table__delete_note(table, "hello", 2);
     // HashNote_Table__delete_Branch(table, "hello");

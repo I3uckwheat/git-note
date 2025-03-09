@@ -25,16 +25,12 @@ void HashNote__free_branch(HashNote_Branch* branch) {
     free(branch);
 }
 
-// FIXME: This has a leak somewhere, somewhere in the lower levels of freeing
-// leaving for now as this gets cleaned up after program exit
 void HashNote__free_table(HashNote_Table* table) {
     if(table == NULL) return;
     if(table->branches) {
         for(int i = 0; i < table->size; i++) {
             HashNote__free_branch(table->branches[i]);
             table->branches[i] = NULL;
-            table->count--;
-            if(table->count <= 0) break;
         }
 
         free(table->branches);
@@ -194,7 +190,7 @@ char* HashNote__serialize_table(HashNote_Table* table) {
     // It's just allocating way too much memory for the average usecase
     size_t buffer_size = (table->count * MAX_BRANCH_NAME_LENGTH) + (table->count * MAX_COMMENT_LENGTH * 2);
     size_t buffer_offset = 0;
-    char* serialized_table_buffer = malloc(buffer_size);
+    char* serialized_table_buffer = calloc(1, buffer_size);
     serialized_table_buffer[0] = '\0';
 
     for(int i = 0; i < table->size; i++) {
@@ -216,6 +212,7 @@ char* HashNote__serialize_table(HashNote_Table* table) {
         }
 
         strncat(serialized_table_buffer, serialized_branch, serialized_branch_size);
+        free(serialized_branch);
         buffer_offset += serialized_branch_size + 1;
         serialized_table_buffer[buffer_offset - 1] = '\n';
     }
