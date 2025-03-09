@@ -25,6 +25,8 @@ void HashNote__free_branch(HashNote_Branch* branch) {
     free(branch);
 }
 
+// FIXME: This has a leak somewhere, somewhere in the lower levels of freeing
+// leaving for now as this gets cleaned up after program exit
 void HashNote__free_table(HashNote_Table* table) {
     if(table == NULL) return;
     if(table->branches) {
@@ -181,4 +183,81 @@ int HashNote_Table__delete_note(HashNote_Table* table, char* branch_name, unsign
     HashNote__free_note(note);
     branch->notes[index] = NULL;
     return 0;
+}
+
+// branch||comment|comment|comment|\n
+// branch2||comment|comment|comment|\n
+// branch3||comment|comment|comment|\n
+char* HashNote__serialize_table(HashNote_Table* table) {
+    // TODO: find better sane default, this is expensive
+    // It's also expensive to double it every time we need more, but may be OK
+    // It's just allocating way too much memory for the average usecase
+    size_t buffer_size = (table->count * MAX_BRANCH_NAME_LENGTH) + (table->count * MAX_COMMENT_LENGTH * 2);
+    size_t buffer_offset = 0;
+    char* serialized_table_buffer = malloc(buffer_size);
+    serialized_table_buffer[0] = '\0';
+
+    for(int i = 0; i < table->size; i++) {
+        HashNote_Branch* branch = table->branches[i];
+        if(!branch) continue;
+
+        size_t size_remaining = buffer_size - buffer_offset;
+
+        char* serialized_branch = HashNote__serialize_branch(branch);
+        size_t serialized_branch_size = strlen(serialized_branch);
+
+        if(serialized_branch_size > size_remaining) {
+            size_t new_buffer_size = buffer_size * 2;
+            serialized_table_buffer = realloc(serialized_table_buffer, new_buffer_size);
+            if(!serialized_table_buffer) {
+                fprintf(stderr, "Failed to allocate memory for serialization\n");
+                return NULL;
+            }
+        }
+
+        strncat(serialized_table_buffer, serialized_branch, serialized_branch_size);
+        buffer_offset += serialized_branch_size + 1;
+        serialized_table_buffer[buffer_offset - 1] = '\n';
+    }
+
+    return serialized_table_buffer;
+}
+
+// FIXME: This likely has memory issues
+// branch||comment|comment|comment|\n
+char* HashNote__serialize_branch(HashNote_Branch* branch) {
+    if (!branch) return NULL;
+
+    // TODO: This uses a lot of memory unnecessarily
+    // Using resizing of strings instead of just setting them based on a max
+    size_t total_size = MAX_BRANCH_NAME_LENGTH + (branch->size * MAX_COMMENT_LENGTH) + 1; // +1 for null terminator
+    char* serialized_branch = (char*) malloc(total_size);
+    if (serialized_branch == NULL) {
+        fprintf(stderr, "Failed to allocate memory for serialization\n");
+        return NULL;
+    }
+
+    serialized_branch[0] = '\0';  // Start with an empty string
+    snprintf(serialized_branch, MAX_BRANCH_NAME_LENGTH - 1, "%s||", branch->name);
+
+    size_t offset = strlen(serialized_branch);
+    
+    for (int i = 0; i < branch->size; i++) {
+        HashNote_Note* note = branch->notes[i];
+        if (!note) continue;
+
+        size_t remaining_space = total_size - offset - 1; // Leave space for null
+        if(remaining_space <= 0) {
+            fprintf(stderr, "String size too small for notes");
+            exit(1);
+        }
+
+        // Adding to the string based on the offset
+        snprintf(serialized_branch + offset, MAX_COMMENT_LENGTH - 1, "%s|", note->text);
+        offset = strlen(serialized_branch);
+        remaining_space = total_size - offset;
+    }
+
+    serialized_branch[total_size - 1] = '\0';  // Ensure null termination
+    return serialized_branch;
 }

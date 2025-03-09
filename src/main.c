@@ -58,36 +58,28 @@ int main(int argc, char *argv[]) {
     HashNote__create_note(table, "hello", "world2j");
     HashNote__create_note(table, "hello", "world3");
     HashNote__create_note(table, "hello", "world4");
+    HashNote__create_note(table, "hello", "world4");
+    HashNote__create_note(table, "hello", "world4");
+    HashNote__create_note(table, "hello", "world4");
+    HashNote__create_note(table, "hello", "world4");
+    HashNote__create_note(table, "hello", "world4");
+
     HashNote__create_note(table, "foo", "bar");
     HashNote__create_note(table, "foo", "baz");
-    HashNote__create_note(table, "foo", "fee");
+    HashNote__create_note(table, "foo", "nota");
+    HashNote__create_note(table, "foo", "weenie");
+
     HashNote_Branch* branch = HashNote__get_branch(table, "hello");
-    HashNote_Branch* branch2 = HashNote__get_branch(table, "foo");
-    printf("\n\nbranch: %s, text of: %s\n", branch->name, branch->notes[branch->count - 2]->text);
-    printf("branch: %s, text of: %s\n\n", branch2->name, branch2->notes[branch2->count - 2]->text);
 
-    HashNote_Table__delete_note(table, "hello", 2);
+    char* serialized = HashNote__serialize_table(table);
 
-    HashNote_Table__delete_Branch(table, "hello");
-    HashNote_Table__delete_Branch(table, "foo");
-    HashNote_Table__delete_table(table);
+    printf("%s", serialized);
 
+    // HashNote_Table__delete_note(table, "hello", 2);
+    // HashNote_Table__delete_Branch(table, "hello");
     // HashNote_Table__delete_Branch(table, "foo");
-    // branch2 = HashNote__get_branch(table, "foo");
-    // HashNote_Table__upsert(table, "hello2", "world2");
-    // HashNote_Table__upsert(table, "how", "areyou");
-    // HashNote_Table__print(table);
-    // HashNote_Item* note1 = HashNote_Table__get_item(table, "hello");
-    // if(note1 != NULL) {
-    //     printf("branch: %s, comment: %s\n\n", note1->branch, note1->comment);
-    // }
-    // char* noteLineStart = "[ ] | hello world\n";
-    // size_t noteSize = 19;
+    // HashNote_Table__delete_table(table);
 
-    // Note *test = new_note(noteLineStart, noteSize);
-    // printf("Note: %s\n\n", test->body);
-    // exit(0);
-    // return 0;
 
     // char command = parse_command(argc, argv[1]);
 

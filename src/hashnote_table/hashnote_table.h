@@ -6,7 +6,7 @@
 
 #define TABLE_CAPACITY 5000 // TODO: Figure out sane max
 #define MAX_BRANCH_NAME_LENGTH 200
-#define MAX_COMMENT_LENGTH 4080
+#define MAX_COMMENT_LENGTH 256
 #define MAX_COMMENTS_ON_BRANCH 300
 
 // Use this for refactoring maybe?
@@ -54,3 +54,7 @@ int HashNote_Table__delete_note(HashNote_Table* table, char* branch_name, unsign
 void HashNote__free_note(HashNote_Note* note);
 void HashNote__free_branch(HashNote_Branch* branch);
 void HashNote__free_table(HashNote_Table* table);
+
+HashNote_Table* HashNote_deserialize();
+char* HashNote__serialize_table(HashNote_Table* table);
+char* HashNote__serialize_branch(HashNote_Branch* branch);
