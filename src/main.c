@@ -52,30 +52,39 @@
 // }
 
 int main(int argc, char *argv[]) {
-    HashNote_Table* table = HashNote__create_table();
+    char* serialized_notes = "hello||1one|2two|3three|4four|\nfoo||bar|baz|not a|weenie|\n";
+    HashNote_Table* table = HashNote__deserialize(serialized_notes, strlen(serialized_notes));
 
-    HashNote__create_note(table, "hello", "world");
-    HashNote__create_note(table, "hello", "world2j");
-    HashNote__create_note(table, "hello", "world3");
-    HashNote__create_note(table, "hello", "world4");
-    HashNote__create_note(table, "hello", "world4");
-    HashNote__create_note(table, "hello", "world4");
-    HashNote__create_note(table, "hello", "world4");
-    HashNote__create_note(table, "hello", "world4");
-    HashNote__create_note(table, "hello", "world4");
+    HashNote_Branch* branch = HashNote__get_branch(table, "foo");
+    if(branch) {
+        printf("First result note: %s\n", branch->notes[0]->text);
+    } else{
+        printf("Failed to make foo branch\n");
+    }
 
-    HashNote__create_note(table, "foo", "bar");
-    HashNote__create_note(table, "foo", "baz");
-    HashNote__create_note(table, "foo", "nota");
-    HashNote__create_note(table, "foo", "weenie");
-
-    HashNote_Branch* branch = HashNote__get_branch(table, "hello");
-
-    char* serialized = HashNote__serialize_table(table);
-
-    printf("%s", serialized);
-    free(serialized);
     HashNote__free_table(table);
+
+    // HashNote_Table* table = HashNote__create_table();
+
+    // HashNote__create_note(table, "hello", "one");
+    // HashNote__create_note(table, "hello", "two");
+    // HashNote__create_note(table, "hello", "three");
+    // HashNote__create_note(table, "hello", "four");
+
+    // HashNote__create_note(table, "foo", "bar");
+    // HashNote__create_note(table, "foo", "baz");
+    // HashNote__create_note(table, "foo", "not a");
+    // HashNote__create_note(table, "foo", "weenie");
+
+    // HashNote_Branch* branch = HashNote__get_branch(table, "hello");
+
+    // char* serialized = HashNote__serialize_table(table);
+
+    // printf("%s", serialized);
+    // free(serialized);
+    // HashNote__free_table(table);
+
+    // ---------------------------
 
     // HashNote_Table__delete_note(table, "hello", 2);
     // HashNote_Table__delete_Branch(table, "hello");
