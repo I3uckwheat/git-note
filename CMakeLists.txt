@@ -10,8 +10,6 @@ set(SOURCE_FILES
     src/add.c
     src/complete.c
     src/file_helpers.c
-    src/note.c
-    src/show.c
 
     src/hashnote_table/hashnote_table.c
 )
