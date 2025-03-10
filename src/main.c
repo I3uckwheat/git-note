@@ -52,29 +52,29 @@
 // }
 
 int main(int argc, char *argv[]) {
-    HashNote_Table* table = HashNote__create_table();
+    // HashNote_Table* table = HashNote__create_table();
 
-    HashNote__create_note(table, "hello", "one");
-    HashNote__create_note(table, "hello", "two");
-    HashNote__create_note(table, "hello", "three");
-    HashNote__create_note(table, "hello", "four");
+    // HashNote__create_note(table, "hello", "one");
+    // HashNote__create_note(table, "hello", "two");
+    // HashNote__create_note(table, "hello", "three");
+    // HashNote__create_note(table, "hello", "four");
 
-    HashNote__create_note(table, "foo", "bar");
-    HashNote__create_note(table, "foo", "baz");
-    HashNote__create_note(table, "foo", "not a");
-    HashNote__create_note(table, "foo", "weenie");
+    // HashNote__create_note(table, "foo", "bar");
+    // HashNote__create_note(table, "foo", "baz");
+    // HashNote__create_note(table, "foo", "not a");
+    // HashNote__create_note(table, "foo", "weenie");
 
-    char* serialized = HashNote__serialize_table(table);
+    // char* serialized = HashNote__serialize_table(table);
 
-    printf("%s", serialized);
     char repo_name[256];
     GitHelpers__get_dir_name(repo_name, sizeof(repo_name));
-    printf("repo_name: %s\n", repo_name);
 
-    Storage__store_serialized_table(serialized, repo_name);   
-    Storage__retrieve_serialized_table("test");
+    char* retrieved = Storage__retrieve_serialized_table(repo_name);
+    HashNote_Table* table = HashNote__deserialize(retrieved);
+    HashNote_Branch* branch = HashNote__get_branch(table, "hello");
+    printf("branch: %s\nnote: %s\n\n", "hello", branch->notes[0]->text);
 
-    free(serialized);
+    free(retrieved);
     HashNote__free_table(table);
 
 

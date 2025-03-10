@@ -57,40 +57,40 @@
 //     return mkdir(noteDirectoryPath, 0775);
 // }
 
-// char *read_file_into_memory(FILE *noteFile) {
-//     size_t chunkSize = 500;
-//     size_t chunks = 1;
-//     size_t charactersRead = 0;
-//     char *temp_notes;
-//     char *notes = malloc(sizeof(char) * chunkSize + 1);
-//     if(notes == NULL) {
-//         printf("Failed to complete note");
-//         exit(1);
-//     }
+char *read_file_into_memory(FILE *noteFile) {
+    size_t chunkSize = 500;
+    size_t chunks = 1;
+    size_t charactersRead = 0;
+    char *temp_notes;
+    char *notes = malloc(sizeof(char) * chunkSize + 1);
+    if(notes == NULL) {
+        printf("Failed to complete note");
+        exit(1);
+    }
 
-//     while(1) {
-//         size_t read = fread(notes + charactersRead, sizeof(char), chunkSize, noteFile);
-//         if(read < chunkSize) {
-//             if(feof(noteFile)) {
-//                 charactersRead += read;
-//                 break;
-//             } else if (ferror(noteFile)) {
-//                 printf("There was an error loading the note file\n");
-//                 exit(1);
-//             }
-//         }
+    while(1) {
+        size_t read = fread(notes + charactersRead, sizeof(char), chunkSize, noteFile);
+        if(read < chunkSize) {
+            if(feof(noteFile)) {
+                charactersRead += read;
+                break;
+            } else if (ferror(noteFile)) {
+                printf("There was an error loading the note file\n");
+                exit(1);
+            }
+        }
 
-//         chunks++;
-//         charactersRead += read;
+        chunks++;
+        charactersRead += read;
 
-//         temp_notes = realloc(notes, chunkSize * chunks);
-//         if(temp_notes == NULL) {
-//             printf("Failed to allocate memory\n");
-//             exit(1);
-//         }
+        temp_notes = realloc(notes, chunkSize * chunks);
+        if(temp_notes == NULL) {
+            printf("Failed to allocate memory\n");
+            exit(1);
+        }
 
-//         notes = temp_notes;
-//     } 
+        notes = temp_notes;
+    } 
 
-//     return notes;
-// }
+    return notes;
+}

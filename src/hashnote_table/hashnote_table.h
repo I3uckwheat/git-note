@@ -55,6 +55,6 @@ void HashNote__free_note(HashNote_Note* note);
 void HashNote__free_branch(HashNote_Branch* branch);
 void HashNote__free_table(HashNote_Table* table);
 
-HashNote_Table* HashNote__deserialize(char* hash_note_string, size_t length);
+HashNote_Table* HashNote__deserialize(char* hash_note_string);
 char* HashNote__serialize_table(HashNote_Table* table);
 char* HashNote__serialize_branch(HashNote_Branch* branch);

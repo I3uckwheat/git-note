@@ -262,24 +262,23 @@ char* HashNote__serialize_branch(HashNote_Branch* branch) {
 // branch||comment|comment|comment|\n
 // branch2||comment|comment|comment|\n
 // branch3||comment|comment|comment|\n
-HashNote_Table* HashNote__deserialize(char* hash_note_string, size_t length) {
+HashNote_Table* HashNote__deserialize(char* hash_note_string) {
     HashNote_Table* table = HashNote__create_table();
     char* current_branch_name = calloc(1, MAX_BRANCH_NAME_LENGTH);
-    HashNote_Branch* current_branch = NULL;
 
     size_t offset = 0;
-    for(size_t i = 0; i < length; i++) {
+    size_t i = 0;
+    while(1) {
         char character = hash_note_string[i];
         if(character == '\0') break;
         if(character == '\n') {
             memset(current_branch_name, 0, MAX_BRANCH_NAME_LENGTH); // Zero the string
-            current_branch = NULL;
             offset++;
         };
 
         if(character == '|' && hash_note_string[i + 1] == '|') {
             strncpy(current_branch_name, hash_note_string + offset, i - offset);
-            current_branch = HashNote__create_branch(table, current_branch_name);
+            HashNote__create_branch(table, current_branch_name);
             offset = i + 1; // To offset the second '|' match
             i = i + 1; // skip the next pipe in iteration
         }
@@ -288,12 +287,13 @@ HashNote_Table* HashNote__deserialize(char* hash_note_string, size_t length) {
             if(i - offset != 0) {
                 char* note_str = calloc(1, MAX_COMMENT_LENGTH);
                 strncpy(note_str, hash_note_string + offset, i - offset);
-                HashNote_Note* note = HashNote__create_note(table, current_branch_name, note_str);
+                HashNote__create_note(table, current_branch_name, note_str);
                 free(note_str); // Do I need this? I think so, check with Valgrind
             }
 
             offset = i + 1;
         }
+        i++;
     }
 
     free(current_branch_name);
