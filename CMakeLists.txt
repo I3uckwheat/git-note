@@ -7,11 +7,11 @@ include_directories(src src/hashnote_table lib)
 set(SOURCE_FILES 
     src/main.c
     src/git_helpers.c
-    src/add.c
-    src/complete.c
+    # src/add.c
     src/file_helpers.c
 
     src/hashnote_table/hashnote_table.c
+    src/storage.c
 )
 
 add_executable(git-note ${SOURCE_FILES})

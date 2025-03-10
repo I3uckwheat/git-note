@@ -5,6 +5,7 @@
 
 #include "add.h"
 #include "hashnote_table.h"
+#include "storage.h"
 
 // struct command {
 //     char* name;
@@ -61,13 +62,14 @@ int main(int argc, char *argv[]) {
     HashNote__create_note(table, "foo", "not a");
     HashNote__create_note(table, "foo", "weenie");
 
-    // HashNote_Branch* branch = HashNote__get_branch(table, "hello");
-
     char* serialized = HashNote__serialize_table(table);
 
     printf("%s", serialized);
+    Storage__store_serialized_table(serialized, "test");   
+
     free(serialized);
     HashNote__free_table(table);
+
 
     // ---------------------------
 
