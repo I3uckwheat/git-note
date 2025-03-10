@@ -6,12 +6,14 @@
 #include "add.h"
 #include "hashnote_table.h"
 #include "storage.h"
+#include "git_helpers.h"
 
 // struct command {
 //     char* name;
 //     char commandFlag;
 // };
 
+// TODO: add command to move notes to new dir
 // static const struct command commands[] = {
 //     {"show", 's'},
 //     {"add", 'a'},
@@ -65,7 +67,12 @@ int main(int argc, char *argv[]) {
     char* serialized = HashNote__serialize_table(table);
 
     printf("%s", serialized);
-    Storage__store_serialized_table(serialized, "test");   
+    char repo_name[256];
+    GitHelpers__get_dir_name(repo_name, sizeof(repo_name));
+    printf("repo_name: %s\n", repo_name);
+
+    Storage__store_serialized_table(serialized, repo_name);   
+    Storage__retrieve_serialized_table("test");
 
     free(serialized);
     HashNote__free_table(table);
