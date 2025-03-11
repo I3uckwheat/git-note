@@ -21,7 +21,13 @@ static struct cag_option options[] = {
     {.identifier = 'h',
     .access_letters = "h",
     .access_name = "help",
-    .description = "shows the command help"}
+    .description = "shows the command help"},
+
+    {.identifier = 'a',
+    .access_letters = "a",
+    .access_name = "add",
+    .value_name = "added-note",
+    .description = "add a note 'git-note -a \"hello world!\"'"},
 };
 
 int main(int argc, char *argv[]) {
@@ -29,6 +35,10 @@ int main(int argc, char *argv[]) {
     GitHelpers__get_dir_name(repo_name, sizeof(repo_name));
     char* retrieved = Storage__retrieve_serialized_table(repo_name);
     HashNote_Table* table = HashNote__deserialize(retrieved);
+    free(retrieved);
+
+    char branch_name[256];
+    GitHelpers__get_branch_name(branch_name, sizeof(branch_name));
 
 
     cag_option_context context;
@@ -46,13 +56,24 @@ int main(int argc, char *argv[]) {
                 } else {
                     Display__list_branches(table);
                 }
-                break;
+                goto end;
+            }
+            case 'a': {
+                const char* added_note = cag_option_get_value(&context);
+                HashNote__create_new_note(table, branch_name, added_note);
+                char* serialized_table = HashNote__serialize_table(table);
+                Storage__store_serialized_table(serialized_table, repo_name);
+                free(serialized_table);
+                goto end;
             }
             case '?':
                 cag_option_print_error(&context, stdout);
                 return 1;
         }
     }
+
+    end:
+    free(table);
 
     // // HashNote_Table* table = HashNote__create_table();
 

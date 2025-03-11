@@ -43,10 +43,11 @@ typedef struct {
 unsigned long HashNote__hash(const char* branch_name);
 
 HashNote_Table* HashNote__create_table();
-HashNote_Branch* HashNote__create_branch(HashNote_Table* table, char* branch_name);
-HashNote_Branch* HashNote_Table__upsert_branch(HashNote_Table* table, char* branch_name);
-HashNote_Note* HashNote__create_new_note(HashNote_Table* table, char* branch_name, char* text);
-HashNote_Note* HashNote__create_note_on_table(HashNote_Table* table, char* branch_name, time_t created_at, time_t modified_at, char* text);
+HashNote_Branch* HashNote__create_branch(HashNote_Table* table, const char* branch_name);
+HashNote_Branch* HashNote_Table__upsert_branch(HashNote_Table* table, const char* branch_name);
+
+HashNote_Note* HashNote__create_new_note(HashNote_Table* table, const char* branch_name, const char* text);
+HashNote_Note* HashNote__create_note_on_table(HashNote_Table* table, const char* branch_name, const time_t created_at, const time_t modified_at, const char* text);
 
 HashNote_Branch** HashNote__get_all_branches(const HashNote_Table* table);
 HashNote_Branch* HashNote__get_branch(const HashNote_Table* table, const char* branch_name);

@@ -65,7 +65,7 @@ HashNote_Table* HashNote__create_table() {
     return table;
 }
 
-HashNote_Branch* HashNote__create_branch(HashNote_Table* table, char* branch_name) {
+HashNote_Branch* HashNote__create_branch(HashNote_Table* table, const char* branch_name) {
     if(!table) return NULL;
     // TODO: Grow table if out of size
     if (table->count == table->size) return NULL;
@@ -106,19 +106,19 @@ HashNote_Branch* HashNote__create_branch(HashNote_Table* table, char* branch_nam
     return branch;
 }
 
-HashNote_Branch* HashNote_Table__upsert_branch(HashNote_Table* table, char* branch_name) {
+HashNote_Branch* HashNote_Table__upsert_branch(HashNote_Table* table, const char* branch_name) {
     unsigned long hash = HashNote__hash(branch_name);
     HashNote_Branch* branch = table->branches[hash];
     if(branch != NULL) return branch;
     return HashNote__create_branch(table, branch_name);
 }
 
-HashNote_Note* HashNote__create_new_note(HashNote_Table* table, char* branch_name, char* text) {
+HashNote_Note* HashNote__create_new_note(HashNote_Table* table, const char* branch_name, const char* text) {
     time_t created_at = time(NULL);
     return HashNote__create_note_on_table(table, branch_name, created_at, created_at, text);
 }
 
-HashNote_Note* HashNote__create_note_on_table(HashNote_Table* table, char* branch_name, time_t created_at, time_t modified_at, char* text) {
+HashNote_Note* HashNote__create_note_on_table(HashNote_Table* table, const char* branch_name, const time_t created_at, const time_t modified_at, const char* text) {
     HashNote_Branch* branch = HashNote_Table__upsert_branch(table, branch_name);
     if(branch->count == branch->size) return NULL;
 
