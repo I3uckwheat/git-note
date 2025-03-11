@@ -26,7 +26,7 @@ static struct cag_option options[] = {
     {.identifier = 'a',
     .access_letters = "a",
     .access_name = "add",
-    .value_name = "added-note",
+    .value_name = "note",
     .description = "add a note 'git-note -a \"hello world!\"'"},
 };
 
