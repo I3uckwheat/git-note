@@ -3,6 +3,7 @@ project(GitNote VERSION 0.1.0)
 enable_language(C)
 
 include_directories(src src/hashnote_table lib)
+add_subdirectory(lib/cargs-stable)
 
 set(SOURCE_FILES 
     src/main.c
@@ -15,6 +16,7 @@ set(SOURCE_FILES
 )
 
 add_executable(git-note ${SOURCE_FILES})
+target_link_libraries(git-note cargs)
 
 # Default build
 if(NOT CMAKE_BUILD_TYPE)

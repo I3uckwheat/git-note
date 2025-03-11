@@ -3,82 +3,72 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <cargs.h>
+
 #include "add.h"
 #include "hashnote_table.h"
 #include "storage.h"
 #include "git_helpers.h"
 
-// struct command {
-//     char* name;
-//     char commandFlag;
-// };
+static struct cag_option options[] = {
+    {.identifier = 'l',
+    .access_letters = "l",
+    .access_name = NULL,
+    .value_name = NULL,
+    .description = "list notes"},
 
-// TODO: add command to move notes to new dir
-// static const struct command commands[] = {
-//     {"show", 's'},
-//     {"add", 'a'},
-//     {"complete", 'c'},
-//     {"remove", 'r'},
-//     {"rm", 'r'},
-// };
+    {.identifier = 'h',
+    .access_letters = "h",
+    .access_name = "help",
+    .description = "shows the command help"}
+};
 
-// void show_help() {
-//     printf("Help\n");
-// }
+int main(int argc, char *argv[]) {
 
-// // Returns -1 if invalid, commandFlag if valid
-// char parse_command(int count, char *command) {
-//     // If only one command is sent we have to assume the user wants to show the notes 
-//     if(count == 1) { 
-//         return 's';
-//     }
+    cag_option_context context;
+    cag_option_init(&context, options, CAG_ARRAY_SIZE(options), argc, argv);
+    while(cag_option_fetch(&context)) {
+        switch(cag_option_get_identifier(&context)) {
+            case 'h':
+                printf("Usage: git-note [OPTION]...\n");
+                cag_option_print(options, CAG_ARRAY_SIZE(options), stdout);
+                break;
+            case 'l':
+                printf("list notes\n");
+                break;
 
-//     if(count < 2) {
-//         return -1;
-//     }
+            case '?':
+                cag_option_print_error(&context, stdout);
+                return 1;
+        }
+    }
 
-//     for(int i = 0; i < sizeof commands / sizeof *commands; i++) {
-//         char commandFlag = commands[i].commandFlag;
+    // // HashNote_Table* table = HashNote__create_table();
 
-//         if(
-//             strncmp(command, commands[i].name, 10) == 0 ||
-//             (strlen(command) == 1 && command[0] == commandFlag)
-//         ) {
-//             return commandFlag;
-//         }
-//     }
+    // // HashNote__create_new_note(table, "hello", "one");
+    // // HashNote__create_new_note(table, "hello", "two");
+    // // HashNote__create_new_note(table, "hello", "three");
+    // // HashNote__create_new_note(table, "hello", "four");
 
-//     return -1;
-// }
-
-// int main(int argc, char *argv[]) {
-int main() {
-    // HashNote_Table* table = HashNote__create_table();
-
-    // HashNote__create_new_note(table, "hello", "one");
-    // HashNote__create_new_note(table, "hello", "two");
-    // HashNote__create_new_note(table, "hello", "three");
-    // HashNote__create_new_note(table, "hello", "four");
-
-    // HashNote__create_new_note(table, "foo", "bar");
-    // HashNote__create_new_note(table, "foo", "baz");
-    // HashNote__create_new_note(table, "foo", "not a");
-    // HashNote__create_new_note(table, "foo", "weenie");
-
-    char repo_name[256];
-    GitHelpers__get_dir_name(repo_name, sizeof(repo_name));
-    // char* serialized_table = HashNote__serialize_table(table);
-    // Storage__store_serialized_table(serialized_table, repo_name);
+    // // HashNote__create_new_note(table, "foo", "bar");
+    // // HashNote__create_new_note(table, "foo", "baz");
+    // // HashNote__create_new_note(table, "foo", "not a");
+    // // HashNote__create_new_note(table, "foo", "weenie");
 
     // char repo_name[256];
     // GitHelpers__get_dir_name(repo_name, sizeof(repo_name));
-    char* retrieved = Storage__retrieve_serialized_table(repo_name);
-    HashNote_Table* table = HashNote__deserialize(retrieved);
-    HashNote_Branch* branch = HashNote__get_branch(table, "hello");
-    printf("name: %s, first_note: %s\n", branch->name, branch->notes[0]->text);
+    // // char* serialized_table = HashNote__serialize_table(table);
+    // // Storage__store_serialized_table(serialized_table, repo_name);
 
-    free(retrieved);
-    HashNote__free_table(table);
+    // // char repo_name[256];
+    // // GitHelpers__get_dir_name(repo_name, sizeof(repo_name));
+    // char* retrieved = Storage__retrieve_serialized_table(repo_name);
+    // HashNote_Table* table = HashNote__deserialize(retrieved);
+    // HashNote_Branch* branch = HashNote__get_branch(table, "hello");
+    // printf("name: %s, first_note: %s\n", branch->name, branch->notes[0]->text);
+
+    // free(retrieved);
+    // HashNote__free_table(table);
 
 
     // ---------------------------
