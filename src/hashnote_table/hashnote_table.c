@@ -1,3 +1,5 @@
+#include <time.h>
+
 #include "hashnote_table.h"
 
 void HashNote__free_note(HashNote_Note* note) {
@@ -111,7 +113,12 @@ HashNote_Branch* HashNote_Table__upsert_branch(HashNote_Table* table, char* bran
     return HashNote__create_branch(table, branch_name);
 }
 
-HashNote_Note* HashNote__create_note(HashNote_Table* table, char* branch_name, char* text) {
+HashNote_Note* HashNote__create_new_note(HashNote_Table* table, char* branch_name, char* text) {
+    time_t created_at = time(NULL);
+    return HashNote__create_note_on_table(table, branch_name, created_at, created_at, text);
+}
+
+HashNote_Note* HashNote__create_note_on_table(HashNote_Table* table, char* branch_name, time_t created_at, time_t modified_at, char* text) {
     HashNote_Branch* branch = HashNote_Table__upsert_branch(table, branch_name);
     if(branch->count == branch->size) return NULL;
 
@@ -123,6 +130,8 @@ HashNote_Note* HashNote__create_note(HashNote_Table* table, char* branch_name, c
     branch->notes[branch->count] = note;
     note->id = branch->count;
     note->branch = branch;
+    note->created_at = created_at;
+    note->modified_at = modified_at;
     branch->count++;
 
     return note;
@@ -181,9 +190,10 @@ int HashNote_Table__delete_note(HashNote_Table* table, char* branch_name, unsign
     return 0;
 }
 
-// branch||comment|comment|comment|\n
-// branch2||comment|comment|comment|\n
-// branch3||comment|comment|comment|\n
+// v1
+// branchname|created_at|modified_at|note|
+// branchname2|created_at|modified_at|note2|
+// branchname|created_at|modified_at|note3|
 char* HashNote__serialize_table(HashNote_Table* table) {
     // TODO: find better sane default, this is expensive
     // It's also expensive to double it every time we need more, but may be OK
@@ -214,19 +224,16 @@ char* HashNote__serialize_table(HashNote_Table* table) {
         strncat(serialized_table_buffer, serialized_branch, serialized_branch_size);
         free(serialized_branch);
         buffer_offset += serialized_branch_size + 1;
-        serialized_table_buffer[buffer_offset - 1] = '\n';
     }
 
     return serialized_table_buffer;
 }
 
-// FIXME: This likely has memory issues
-// branch||comment|comment|comment|\n
+// TODO: Handle escape sequences
+// \n entered into a note will break the whole formatting
 char* HashNote__serialize_branch(HashNote_Branch* branch) {
     if (!branch) return NULL;
 
-    // TODO: This uses a lot of memory unnecessarily
-    // Using resizing of strings instead of just setting them based on a max
     size_t total_size = MAX_BRANCH_NAME_LENGTH + (branch->size * MAX_COMMENT_LENGTH) + 1; // +1 for null terminator
     char* serialized_branch = (char*) malloc(total_size);
     if (serialized_branch == NULL) {
@@ -235,7 +242,6 @@ char* HashNote__serialize_branch(HashNote_Branch* branch) {
     }
 
     serialized_branch[0] = '\0';  // Start with an empty string
-    snprintf(serialized_branch, MAX_BRANCH_NAME_LENGTH - 1, "%s||", branch->name);
 
     size_t offset = strlen(serialized_branch);
     
@@ -245,12 +251,14 @@ char* HashNote__serialize_branch(HashNote_Branch* branch) {
 
         size_t remaining_space = total_size - offset - 1; // Leave space for null
         if(remaining_space <= 0) {
+            // TODO: dynamic allocation for this case
             fprintf(stderr, "String size too small for notes");
             exit(1);
         }
 
         // Adding to the string based on the offset
-        snprintf(serialized_branch + offset, MAX_COMMENT_LENGTH - 1, "%s|", note->text);
+        // branch||created_at|modified_at|note\n
+        snprintf(serialized_branch + offset, MAX_COMMENT_LENGTH - 1, "%s|%lu|%lu|%s|\n", branch->name, note->created_at, note->modified_at, note->text);
         offset = strlen(serialized_branch);
         remaining_space = total_size - offset;
     }
@@ -259,43 +267,60 @@ char* HashNote__serialize_branch(HashNote_Branch* branch) {
     return serialized_branch;
 }
 
-// branch||comment|comment|comment|\n
-// branch2||comment|comment|comment|\n
-// branch3||comment|comment|comment|\n
+void HashNote__deserialize_note(HashNote_Table* table, char* note_line_ptr) {
+    char branch_name[256]; 
+    memset(branch_name, '\0', sizeof(branch_name));
+    time_t created_at = 0;
+    time_t modified_at = 0;
+
+    // Branch name
+    char* branch_name_end_ptr = strchr(note_line_ptr, '|');
+    strncpy(branch_name, note_line_ptr, branch_name_end_ptr - note_line_ptr);
+    note_line_ptr = branch_name_end_ptr + 1; // increment pointer, and move past deliminator
+
+    // created_at
+    // FIXME: Error handle case where returns 0
+    long int parsed_created_at = strtol(note_line_ptr, &note_line_ptr, 10);
+    created_at = (time_t)parsed_created_at;
+    note_line_ptr++; // move past deliminator
+
+    // modified_at
+    // FIXME: Error handle case where returns 0
+    long int parsed_modified_at = strtol(note_line_ptr, &note_line_ptr, 10);
+    modified_at = (time_t)parsed_modified_at;
+    note_line_ptr++; // move past deliminator
+
+    // note text
+    char* note_text_end_ptr = strchr(note_line_ptr, '|');
+    char* note_text = calloc(1, note_text_end_ptr - note_line_ptr);
+    strncpy(note_text, note_line_ptr, note_text_end_ptr - note_line_ptr);
+
+    HashNote__create_note_on_table(table, branch_name, created_at, modified_at, note_text);
+
+    free(note_text);
+}
+
+// TODO: possible optimization is to do this while reading from the file by line instead of loading
+// into memory first
 HashNote_Table* HashNote__deserialize(char* hash_note_string) {
     HashNote_Table* table = HashNote__create_table();
-    char* current_branch_name = calloc(1, MAX_BRANCH_NAME_LENGTH);
 
-    size_t offset = 0;
-    size_t i = 0;
-    while(1) {
-        char character = hash_note_string[i];
-        if(character == '\0') break;
-        if(character == '\n') {
-            memset(current_branch_name, 0, MAX_BRANCH_NAME_LENGTH); // Zero the string
-            offset++;
-        };
-
-        if(character == '|' && hash_note_string[i + 1] == '|') {
-            strncpy(current_branch_name, hash_note_string + offset, i - offset);
-            HashNote__create_branch(table, current_branch_name);
-            offset = i + 1; // To offset the second '|' match
-            i = i + 1; // skip the next pipe in iteration
+    char* last_note_end = hash_note_string;
+    char* current_char_ptr = hash_note_string;
+    while(*current_char_ptr != '\0') {
+        // read until newline, pass string to deserialize_note
+        if(*current_char_ptr == '\n' && *(current_char_ptr + 1) != '\0') {
+            HashNote__deserialize_note(table, last_note_end);
+            last_note_end = current_char_ptr + 1; // moving past newline for next note
         }
 
-        if(character == '|') {
-            if(i - offset != 0) {
-                char* note_str = calloc(1, MAX_COMMENT_LENGTH);
-                strncpy(note_str, hash_note_string + offset, i - offset);
-                HashNote__create_note(table, current_branch_name, note_str);
-                free(note_str); // Do I need this? I think so, check with Valgrind
-            }
-
-            offset = i + 1;
-        }
-        i++;
+        current_char_ptr++;
     }
 
-    free(current_branch_name);
+    // Grab the last line if we don't end on a newline
+    if(last_note_end < current_char_ptr) {
+        HashNote__deserialize_note(table, last_note_end);
+    }
+
     return table;
 }

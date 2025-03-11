@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #define TABLE_CAPACITY 5000 // TODO: Figure out sane max
 #define MAX_BRANCH_NAME_LENGTH 200
@@ -21,6 +22,8 @@ typedef struct HashNote_Branch HashNote_Branch;
 typedef struct {
     unsigned int id;
     char* text;
+    time_t created_at;
+    time_t modified_at;
     HashNote_Branch* branch;
 } HashNote_Note;
 
@@ -42,7 +45,8 @@ unsigned long HashNote__hash(char* branch_name);
 HashNote_Table* HashNote__create_table();
 HashNote_Branch* HashNote__create_branch(HashNote_Table* table, char* branch_name);
 HashNote_Branch* HashNote_Table__upsert_branch(HashNote_Table* table, char* branch_name);
-HashNote_Note* HashNote__create_note(HashNote_Table* table, char* branch_name, char* text);
+HashNote_Note* HashNote__create_new_note(HashNote_Table* table, char* branch_name, char* text);
+HashNote_Note* HashNote__create_note_on_table(HashNote_Table* table, char* branch_name, time_t created_at, time_t modified_at, char* text);
 
 HashNote_Branch* HashNote__get_branch(HashNote_Table* table, char* branch_name);
 HashNote_Note* HashNote__get_note(HashNote_Table* table, char* branch_name, unsigned int id);

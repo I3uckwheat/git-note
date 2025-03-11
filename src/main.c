@@ -51,40 +51,37 @@
 //     return -1;
 // }
 
-int main(int argc, char *argv[]) {
+// int main(int argc, char *argv[]) {
+int main() {
     // HashNote_Table* table = HashNote__create_table();
 
-    // HashNote__create_note(table, "hello", "one");
-    // HashNote__create_note(table, "hello", "two");
-    // HashNote__create_note(table, "hello", "three");
-    // HashNote__create_note(table, "hello", "four");
+    // HashNote__create_new_note(table, "hello", "one");
+    // HashNote__create_new_note(table, "hello", "two");
+    // HashNote__create_new_note(table, "hello", "three");
+    // HashNote__create_new_note(table, "hello", "four");
 
-    // HashNote__create_note(table, "foo", "bar");
-    // HashNote__create_note(table, "foo", "baz");
-    // HashNote__create_note(table, "foo", "not a");
-    // HashNote__create_note(table, "foo", "weenie");
-
-    // char* serialized = HashNote__serialize_table(table);
+    // HashNote__create_new_note(table, "foo", "bar");
+    // HashNote__create_new_note(table, "foo", "baz");
+    // HashNote__create_new_note(table, "foo", "not a");
+    // HashNote__create_new_note(table, "foo", "weenie");
 
     char repo_name[256];
     GitHelpers__get_dir_name(repo_name, sizeof(repo_name));
+    // char* serialized_table = HashNote__serialize_table(table);
+    // Storage__store_serialized_table(serialized_table, repo_name);
 
+    // char repo_name[256];
+    // GitHelpers__get_dir_name(repo_name, sizeof(repo_name));
     char* retrieved = Storage__retrieve_serialized_table(repo_name);
     HashNote_Table* table = HashNote__deserialize(retrieved);
     HashNote_Branch* branch = HashNote__get_branch(table, "hello");
-    printf("branch: %s\nnote: %s\n\n", "hello", branch->notes[0]->text);
+    printf("name: %s, first_note: %s\n", branch->name, branch->notes[0]->text);
 
     free(retrieved);
     HashNote__free_table(table);
 
 
     // ---------------------------
-
-    // HashNote_Table__delete_note(table, "hello", 2);
-    // HashNote_Table__delete_Branch(table, "hello");
-    // HashNote_Table__delete_Branch(table, "foo");
-    // HashNote_Table__delete_table(table);
-
 
     // char command = parse_command(argc, argv[1]);
 
