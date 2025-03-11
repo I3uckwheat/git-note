@@ -21,11 +21,10 @@ void Display__list_notes(const HashNote_Table* table, const char* branch_name) {
         return;
     }
 
-    printf("| id | note\n");
+    printf("id | note\n");
     printf("-----------\n");
     for(size_t i = 0; i < branch->count; i++) {
         HashNote_Note* note = branch->notes[i];
-        printf("| %li | %s\n", i, note->text);
+        printf(" %li | %s\n", i, note->text);
     }
-    
 }
