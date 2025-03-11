@@ -9,6 +9,7 @@
 #include "hashnote_table.h"
 #include "storage.h"
 #include "git_helpers.h"
+#include "display_notes.h"
 
 static struct cag_option options[] = {
     {.identifier = 'l',
@@ -24,6 +25,10 @@ static struct cag_option options[] = {
 };
 
 int main(int argc, char *argv[]) {
+    char repo_name[256];
+    GitHelpers__get_dir_name(repo_name, sizeof(repo_name));
+    char* retrieved = Storage__retrieve_serialized_table(repo_name);
+    HashNote_Table* table = HashNote__deserialize(retrieved);
 
     cag_option_context context;
     cag_option_init(&context, options, CAG_ARRAY_SIZE(options), argc, argv);
@@ -34,7 +39,7 @@ int main(int argc, char *argv[]) {
                 cag_option_print(options, CAG_ARRAY_SIZE(options), stdout);
                 break;
             case 'l':
-                printf("list notes\n");
+                Display__list_branches(table);
                 break;
 
             case '?':

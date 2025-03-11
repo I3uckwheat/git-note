@@ -30,14 +30,14 @@ typedef struct {
 typedef struct HashNote_Branch {
     char* name; // TODO: Figure out maximum possible
     HashNote_Note** notes;
-    int size;
-    int count;
+    size_t size;
+    size_t count;
 } HashNote_Branch;
 
 typedef struct {
     HashNote_Branch** branches;
-    int size;
-    int count;
+    size_t size;
+    size_t count;
 } HashNote_Table;
 
 unsigned long HashNote__hash(char* branch_name);
@@ -48,6 +48,7 @@ HashNote_Branch* HashNote_Table__upsert_branch(HashNote_Table* table, char* bran
 HashNote_Note* HashNote__create_new_note(HashNote_Table* table, char* branch_name, char* text);
 HashNote_Note* HashNote__create_note_on_table(HashNote_Table* table, char* branch_name, time_t created_at, time_t modified_at, char* text);
 
+HashNote_Branch** HashNote__get_all_branches(HashNote_Table* table);
 HashNote_Branch* HashNote__get_branch(HashNote_Table* table, char* branch_name);
 HashNote_Note* HashNote__get_note(HashNote_Table* table, char* branch_name, unsigned int id);
 

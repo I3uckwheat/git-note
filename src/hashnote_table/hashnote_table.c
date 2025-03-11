@@ -12,7 +12,7 @@ void HashNote__free_note(HashNote_Note* note) {
 void HashNote__free_branch(HashNote_Branch* branch) {
     if(branch == NULL) return;
     if(branch->notes != NULL) {
-        for(int i = 0; i < branch->size; i++) {
+        for(size_t i = 0; i < branch->size; i++) {
             HashNote__free_note(branch->notes[i]);
             branch->notes[i] = NULL;
             branch->count--;
@@ -30,7 +30,7 @@ void HashNote__free_branch(HashNote_Branch* branch) {
 void HashNote__free_table(HashNote_Table* table) {
     if(table == NULL) return;
     if(table->branches) {
-        for(int i = 0; i < table->size; i++) {
+        for(size_t i = 0; i < table->size; i++) {
             HashNote__free_branch(table->branches[i]);
             table->branches[i] = NULL;
         }
@@ -94,7 +94,7 @@ HashNote_Branch* HashNote__create_branch(HashNote_Table* table, char* branch_nam
     }
 
     // Initialize notes array to NULL
-    for (int i = 0; i < branch->size; i++) {
+    for (size_t i = 0; i < branch->size; i++) {
         branch->notes[i] = NULL;
     }
 
@@ -137,6 +137,23 @@ HashNote_Note* HashNote__create_note_on_table(HashNote_Table* table, char* branc
     return note;
 }
 
+HashNote_Branch** HashNote__get_all_branches(HashNote_Table* table) {
+    HashNote_Branch** branch_ptr_array = calloc(table->count, sizeof(HashNote_Branch*));
+    size_t branch_ptr_array_index = 0;
+    
+    for(size_t i = 0; i < table->size; i++) {
+        HashNote_Branch* branch = table->branches[i];
+        if(branch != NULL) {
+            branch_ptr_array[branch_ptr_array_index] = branch;
+            branch_ptr_array_index++;
+        }
+
+        if(branch_ptr_array_index == table->count) return branch_ptr_array;
+    }
+
+    return branch_ptr_array;
+}
+
 HashNote_Branch* HashNote__get_branch(HashNote_Table* table, char* branch_name) {
     unsigned long hash = HashNote__hash(branch_name);
     return table->branches[hash]; 
@@ -146,7 +163,7 @@ HashNote_Note* HashNote__get_note(HashNote_Table* table, char* branch_name, unsi
     HashNote_Branch* branch = HashNote__get_branch(table, branch_name);
     if(!branch) return NULL;
 
-    for(int i = 0; i < branch->size; i++) {
+    for(size_t i = 0; i < branch->size; i++) {
         HashNote_Note* note = branch->notes[i];
         if(!note) continue;
         if(note->id == id) return note;
@@ -176,7 +193,7 @@ int HashNote_Table__delete_note(HashNote_Table* table, char* branch_name, unsign
     if(!note) return 0;
 
     unsigned int index = 0;
-    for(int i = 0; i < branch->size; i++) {
+    for(size_t i = 0; i < branch->size; i++) {
         HashNote_Note* note = branch->notes[i];
         if(!note) continue;
         if(note->id == id) {
@@ -203,7 +220,7 @@ char* HashNote__serialize_table(HashNote_Table* table) {
     char* serialized_table_buffer = calloc(1, buffer_size);
     serialized_table_buffer[0] = '\0';
 
-    for(int i = 0; i < table->size; i++) {
+    for(size_t i = 0; i < table->size; i++) {
         HashNote_Branch* branch = table->branches[i];
         if(!branch) continue;
 
@@ -245,7 +262,7 @@ char* HashNote__serialize_branch(HashNote_Branch* branch) {
 
     size_t offset = strlen(serialized_branch);
     
-    for (int i = 0; i < branch->size; i++) {
+    for (size_t i = 0; i < branch->size; i++) {
         HashNote_Note* note = branch->notes[i];
         if (!note) continue;
 
