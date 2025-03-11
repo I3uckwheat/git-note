@@ -41,7 +41,7 @@ void HashNote__free_table(HashNote_Table* table) {
     free(table);
 }
 
-unsigned long HashNote__hash(char* branch_name) {
+unsigned long HashNote__hash(const char* branch_name) {
     unsigned long hash = 5381;  // Initialize with a large prime number
     int c;
 
@@ -137,7 +137,7 @@ HashNote_Note* HashNote__create_note_on_table(HashNote_Table* table, char* branc
     return note;
 }
 
-HashNote_Branch** HashNote__get_all_branches(HashNote_Table* table) {
+HashNote_Branch** HashNote__get_all_branches(const HashNote_Table* table) {
     HashNote_Branch** branch_ptr_array = calloc(table->count, sizeof(HashNote_Branch*));
     size_t branch_ptr_array_index = 0;
     
@@ -154,12 +154,12 @@ HashNote_Branch** HashNote__get_all_branches(HashNote_Table* table) {
     return branch_ptr_array;
 }
 
-HashNote_Branch* HashNote__get_branch(HashNote_Table* table, char* branch_name) {
+HashNote_Branch* HashNote__get_branch(const HashNote_Table* table, const char* branch_name) {
     unsigned long hash = HashNote__hash(branch_name);
     return table->branches[hash]; 
 }
 
-HashNote_Note* HashNote__get_note(HashNote_Table* table, char* branch_name, unsigned int id) {
+HashNote_Note* HashNote__get_note(const HashNote_Table* table, const char* branch_name, const unsigned int id) {
     HashNote_Branch* branch = HashNote__get_branch(table, branch_name);
     if(!branch) return NULL;
 

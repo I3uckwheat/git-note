@@ -15,7 +15,7 @@ static struct cag_option options[] = {
     {.identifier = 'l',
     .access_letters = "l",
     .access_name = NULL,
-    .value_name = NULL,
+    .value_name = "branch",
     .description = "list notes"},
 
     {.identifier = 'h',
@@ -30,6 +30,7 @@ int main(int argc, char *argv[]) {
     char* retrieved = Storage__retrieve_serialized_table(repo_name);
     HashNote_Table* table = HashNote__deserialize(retrieved);
 
+
     cag_option_context context;
     cag_option_init(&context, options, CAG_ARRAY_SIZE(options), argc, argv);
     while(cag_option_fetch(&context)) {
@@ -38,10 +39,15 @@ int main(int argc, char *argv[]) {
                 printf("Usage: git-note [OPTION]...\n");
                 cag_option_print(options, CAG_ARRAY_SIZE(options), stdout);
                 break;
-            case 'l':
-                Display__list_branches(table);
+            case 'l': {
+                const char* branch_name = cag_option_get_value(&context);
+                if(branch_name) {
+                    Display__list_notes(table, branch_name);
+                } else {
+                    Display__list_branches(table);
+                }
                 break;
-
+            }
             case '?':
                 cag_option_print_error(&context, stdout);
                 return 1;
