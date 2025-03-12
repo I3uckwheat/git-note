@@ -58,6 +58,7 @@ static struct cag_option options[] = {
 };
 
 enum Operation {
+    None,
     Add_Note,
     Edit_Note,
     Delete_Note,
@@ -66,15 +67,15 @@ enum Operation {
     List_All,
 };
 
-// TODO: Add a "needs_save" bool
 typedef struct Config {
     enum Operation operation;
     char repo_name[256];
     char branch_name[256];
-    // char* added_note;
+    const char* added_note;
     size_t note_id;
     bool confirmed;
     HashNote_Table* table;
+    bool dirty;
 } Config;
 
 static Config config;
@@ -82,7 +83,8 @@ static Config config;
 // Setup defaults
 void setup_config() {
     config.confirmed = false;
-    config.operation = List_All;
+    config.operation = None;
+    config.dirty = false;
     GitHelpers__get_dir_name(config.repo_name, sizeof(config.repo_name));
     GitHelpers__get_branch_name(config.branch_name, sizeof(config.branch_name));
 
@@ -91,20 +93,11 @@ void setup_config() {
     free(retrieved);
 }
 
-void list_notes() {
-    if(config.operation == List_Branch) {
-        Display__list_notes(config.table, config.branch_name);
-    } else {
-        Display__list_branches(config.table);
-    }
-}
-
 // TODO: if no note, open editor
-void add_note(const char* added_note) {
-    HashNote__create_new_note(config.table, config.branch_name, added_note);
-    char* serialized_table = HashNote__serialize_table(config.table);
-    Storage__store_serialized_table(serialized_table, config.repo_name);
-    free(serialized_table);
+void add_note() {
+    HashNote__create_new_note(config.table, config.branch_name, config.added_note); 
+    config.added_note = NULL;
+    config.dirty = true;
 }
 
 void edit_note() {
@@ -114,17 +107,42 @@ void edit_note() {
     free(note->text);
     note->text = edited_note_text; 
     note->modified_at = time(NULL);
-
-    char* serialized_table = HashNote__serialize_table(config.table);
-    Storage__store_serialized_table(serialized_table, config.repo_name);
-    free(serialized_table);
+    config.dirty = true;
 }
 
 void delete_note() {
     HashNote_Table__delete_note(config.table, config.branch_name, config.note_id);
-    char* serialized_table = HashNote__serialize_table(config.table);
-    Storage__store_serialized_table(serialized_table, config.repo_name);
-    free(serialized_table);
+    config.dirty = true;
+}
+
+void execute() {
+    switch(config.operation) {
+        case List_All:
+            Display__list_branches(config.table);
+            break;
+        case List_Branch:
+            Display__list_notes(config.table, config.branch_name);
+            break;
+        case Add_Note:
+            add_note();
+            break;
+        case Edit_Note:
+            edit_note();
+            break;
+        case Delete_Note:
+            delete_note();
+            break;
+        case Delete_Branch:
+            printf("Not implemented\n");
+        default:
+            break;
+    }
+
+    if(config.dirty) {
+        char* serialized_table = HashNote__serialize_table(config.table);
+        Storage__store_serialized_table(serialized_table, config.repo_name);
+        free(serialized_table);
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -137,7 +155,7 @@ int main(int argc, char *argv[]) {
             case 'h': {
                 printf("Usage: git-note [OPTION]...\n");
                 cag_option_print(options, CAG_ARRAY_SIZE(options), stdout);
-                break;
+                goto end;
             }
 
             // FIXME: When note file is empty or missing, we get a segfault
@@ -150,14 +168,13 @@ int main(int argc, char *argv[]) {
                     strncpy(config.branch_name, branch_name, sizeof(config.branch_name));
                 }
 
-                list_notes();
                 goto end;
             }
 
             case 'a': {
                 config.operation = Add_Note;
                 const char* added_note = cag_option_get_value(&context);
-                add_note(added_note);
+                config.added_note = added_note;
                 goto end;
             }
 
@@ -181,12 +198,11 @@ int main(int argc, char *argv[]) {
 
                 config.note_id = note_id;
 
-                edit_note();
-
                 goto end;
             }
 
             case 'd': {
+                config.operation = Delete_Note;
                 const char* branch_name = cag_option_get_value(&context);
                 strncpy(config.branch_name, branch_name, sizeof(config.branch_name));
 
@@ -219,5 +235,7 @@ int main(int argc, char *argv[]) {
     }
 
     end:
+
+    execute();
     free(config.table);
 }
