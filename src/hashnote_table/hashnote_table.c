@@ -316,8 +316,6 @@ void HashNote__deserialize_note(HashNote_Table* table, char* note_line_ptr) {
     note_text[note_length] = '\0';
 
     HashNote__create_note_on_table(table, branch_name, created_at, modified_at, note_text);
-    HashNote_Branch* branch = HashNote__get_branch(table, branch_name);
-
     free(note_text);
 }
 

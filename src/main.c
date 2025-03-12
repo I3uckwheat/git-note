@@ -99,7 +99,6 @@ int main(int argc, char *argv[]) {
 
                 HashNote_Note* note = HashNote__get_note(table, branch_name, note_id);
                 char* edited_note_text = edit_with_git_editor(note->text);
-                size_t note_len = strlen(edited_note_text);
 
                 free(note->text);
                 note->text = edited_note_text; 
