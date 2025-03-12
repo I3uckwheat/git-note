@@ -187,7 +187,7 @@ int HashNote_Table__delete_Branch(HashNote_Table* table, char* branch_name) {
     return 0;
 }
 
-int HashNote_Table__delete_note(HashNote_Table* table, char* branch_name, unsigned int id) {
+int HashNote_Table__delete_note(const HashNote_Table* table, const char* branch_name, const unsigned int id) {
     HashNote_Note* note = HashNote__get_note(table, branch_name, id);
     HashNote_Branch* branch = note->branch;
     if(!note) return 0;

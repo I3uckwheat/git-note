@@ -55,7 +55,7 @@ HashNote_Note* HashNote__get_note(const HashNote_Table* table, const char* branc
 
 int HashNote_Table__delete_table(HashNote_Table* table);
 int HashNote_Table__delete_Branch(HashNote_Table* table, char* branch_name);
-int HashNote_Table__delete_note(HashNote_Table* table, char* branch_name, unsigned int id);
+int HashNote_Table__delete_note(const HashNote_Table* table, const char* branch_name, const unsigned int id);
 
 void HashNote__free_note(HashNote_Note* note);
 void HashNote__free_branch(HashNote_Branch* branch);
