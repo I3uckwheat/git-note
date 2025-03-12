@@ -20,7 +20,7 @@
 typedef struct HashNote_Branch HashNote_Branch;
 
 typedef struct {
-    unsigned int id;
+    size_t id;
     char* text;
     time_t created_at;
     time_t modified_at;

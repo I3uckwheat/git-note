@@ -128,11 +128,11 @@ HashNote_Note* HashNote__create_note_on_table(HashNote_Table* table, const char*
     note->text[MAX_COMMENT_LENGTH - 1] = '\0';
 
     branch->notes[branch->count] = note;
+    branch->count++;
     note->id = branch->count;
     note->branch = branch;
     note->created_at = created_at;
     note->modified_at = modified_at;
-    branch->count++;
 
     return note;
 }
@@ -309,10 +309,14 @@ void HashNote__deserialize_note(HashNote_Table* table, char* note_line_ptr) {
 
     // note text
     char* note_text_end_ptr = strchr(note_line_ptr, '|');
-    char* note_text = calloc(1, note_text_end_ptr - note_line_ptr);
-    strncpy(note_text, note_line_ptr, note_text_end_ptr - note_line_ptr);
+
+    size_t note_length = note_text_end_ptr - note_line_ptr;
+    char* note_text = calloc(1, note_length + 1);
+    strncpy(note_text, note_line_ptr, note_length);
+    note_text[note_length] = '\0';
 
     HashNote__create_note_on_table(table, branch_name, created_at, modified_at, note_text);
+    HashNote_Branch* branch = HashNote__get_branch(table, branch_name);
 
     free(note_text);
 }

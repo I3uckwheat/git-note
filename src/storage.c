@@ -36,7 +36,6 @@ int Storage__build_note_file_path(char* buffer, size_t buffer_size, char* root_n
 
 // TODO: Error handling
 int Storage__store_serialized_table(char* serialized_table, char* repo_name) {
-
     char root_note_directory[4096 - 256];
     Storage__build_root_directory(root_note_directory, sizeof(root_note_directory));
     Storage__verify_root_note_dir(root_note_directory);

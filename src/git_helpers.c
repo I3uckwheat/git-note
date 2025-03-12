@@ -41,17 +41,31 @@ int GitHelpers__get_dir_name(char *buffer, size_t bufferSize) {
     return 0;
 }
 
-// int get_configured_editor_path(char *buffer, size_t bufferSize) {
-//     FILE *fp;
-//     fp = popen("whereis $(git config --get core.editor)", "r");
-//     if(fp == NULL) {
-//         printf("Failed to access git");
-//         return 1;
-//     }
+int get_configured_editor_path(char *buffer, size_t bufferSize) {
+    FILE *fp;
 
-//     while(fgets(buffer, bufferSize, fp) != NULL);
-//     buffer[strcspn(buffer, "\n")] = 0; // Removes the newline returned from the git command
+    char editor_path[4028];
+    memset(editor_path, '\0', sizeof(editor_path));
 
-//     pclose(fp);
-//     return 0;
-// }
+    fp = popen("echo $(git config --get core.editor)", "r");
+    if(fp == NULL) {
+        printf("Failed to access git, is 'git' installed?");
+        return 1;
+    }
+    while(fgets(editor_path, sizeof(editor_path), fp) != NULL);
+    buffer[strcspn(editor_path, "\n")] = 0; // Removes the newline returned from the git command
+
+    if(editor_path[0] == '\0') {
+        printf("core.editor is not configured in git.\n");
+        printf("run `git config --global core.editor vim` to configure.\n");
+        return 1;
+    }
+    pclose(fp);
+
+    fp = popen("which $(git config --get core.editor)", "r");
+    while(fgets(buffer, bufferSize, fp) != NULL);
+    buffer[strcspn(buffer, "\n")] = 0; // Removes the newline returned from the git command
+    pclose(fp);
+
+    return 0;
+}

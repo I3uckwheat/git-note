@@ -8,7 +8,6 @@ add_subdirectory(lib/cargs-stable)
 set(SOURCE_FILES 
     src/main.c
     src/git_helpers.c
-    # src/add.c
     src/file_helpers.c
 
     src/hashnote_table/hashnote_table.c
