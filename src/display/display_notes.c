@@ -61,6 +61,10 @@ void Display__list_notes(const HashNote_Table* table, const char* branch_name) {
 
 void Display__note(const HashNote_Table* table, const char* branch_name, const size_t note_id) {
     const HashNote_Note* note = HashNote__get_note(table, branch_name, note_id);
+    if(!note) {
+        printf("No note found on branch '%s' with id '%lu'. Check with `git-note -l`.\n", branch_name, note_id);
+        exit(1);
+    }
 
     char created_at[26];
     char modified_at[26];

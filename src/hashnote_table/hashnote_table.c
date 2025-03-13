@@ -351,7 +351,7 @@ HashNote_Table* HashNote__deserialize(char* hash_note_string) {
     return table;
 }
 
-int HashNote_Table__sort_notes_by_entry_order_desc(HashNote_Table* table) {
+int HashNote_Table__reverse_note_order(HashNote_Table* table) {
     size_t visited_count = 0;
     for(size_t i = 0; i < table->size; i++) {
         HashNote_Branch* branch = table->branches[i];

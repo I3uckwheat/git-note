@@ -91,15 +91,10 @@ void setup_config() {
 
     char* retrieved = Storage__retrieve_serialized_table(config.repo_name);
     config.table = HashNote__deserialize(retrieved);
-    int result = HashNote_Table__sort_notes_by_entry_order_desc(config.table);
     free(retrieved);
-
-    if(result != 0) {
-        printf("Failed to sort table");
-        exit(1);
-    }
 }
 
+// TODO: Ensure new notes are added as number 1
 // TODO: if no note, open editor
 void add_note() {
     HashNote__create_new_note(config.table, config.branch_name, config.added_note); 
@@ -235,7 +230,6 @@ void parse_flags(int argc, char *argv[]) {
         }
     }
 
-    // TODO: second parameter displays note details
     if(config.operation == None) {
         int param_index = 0;
 
