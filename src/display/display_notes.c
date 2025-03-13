@@ -10,7 +10,7 @@ void Display__list_branches(const HashNote_Table* table) {
     for(size_t i = 0; i < table->count; i++) {
         HashNote_Branch* branch = branches[i];
 
-        char* note_text = strdup(branch->notes[0]->text);
+        char* note_text = strdup(branch->head_note->text);
         if(!note_text) {
             printf("Failed to dupe string\n");
             exit(1);
@@ -38,9 +38,8 @@ void Display__list_notes(const HashNote_Table* table, const char* branch_name) {
 
     printf("id | note\n");
     printf("---------\n");
-    for(size_t i = 0; i < branch->count; i++) {
-        HashNote_Note* note = branch->notes[i];
-
+    HashNote_Note* note = branch->head_note;
+    while(note) {
         char* text_copy = strdup(note->text);
         if(!text_copy) {
             printf("Failed to dupe string\n");
@@ -56,6 +55,7 @@ void Display__list_notes(const HashNote_Table* table, const char* branch_name) {
         }
 
         free(text_copy);
+        note = note->next;
     }
 }
 
