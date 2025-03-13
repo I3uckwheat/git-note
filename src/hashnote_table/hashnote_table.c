@@ -224,12 +224,16 @@ int HashNote_Table__delete_Branch(HashNote_Table* table, char* branch_name) {
 }
 
 int HashNote_Table__delete_note(const HashNote_Table* table, const char* branch_name, const unsigned int id) {
+    HashNote_Branch* branch = HashNote__get_branch(table, branch_name);
     HashNote_Note* note = HashNote__get_note(table, branch_name, id);
     while(note) {
         if(note->id == id) {
-            // Remove from linked list
-            note->prev->next = note->next;
-            note->prev = note->prev;
+            // If this note is the head
+            if(!note->prev) { 
+                branch->head_note = note->next;
+            } else {
+                note->prev->next = note->next;
+            }
 
             HashNote__free_note(note);
             return 0;
