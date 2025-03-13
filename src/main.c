@@ -58,6 +58,7 @@ static struct cag_option options[] = {
 
 enum Operation {
     None,
+    Help,
     Add_Note,
     Edit_Note,
     Delete_Note,
@@ -154,6 +155,7 @@ void parse_flags(int argc, char *argv[]) {
         if(config.operation == None) {
             switch (option_identifier) {
             case 'h': {
+                config.operation = Help;
                 printf("Usage: git-note [OPTION]...\n");
                 cag_option_print(options, CAG_ARRAY_SIZE(options), stdout);
                 break;
@@ -220,6 +222,21 @@ void parse_flags(int argc, char *argv[]) {
                 cag_option_print_error(&context, stdout);
                 exit(1);
             }
+        }
+    }
+
+    // TODO: second parameter displays note details
+    if(config.operation == None) {
+        int param_index = 0;
+        param_index = cag_option_get_index(&context);
+
+        // first param is branch
+        char* branch_name = argv[param_index];
+        if(branch_name) {
+            strncpy(config.branch_name, branch_name, sizeof(config.branch_name));
+            config.operation = List_Branch;
+        } else {
+            config.operation = List_All;
         }
     }
 }
