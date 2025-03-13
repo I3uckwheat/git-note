@@ -213,9 +213,6 @@ int HashNote_Table__delete_note(const HashNote_Table* table, const char* branch_
 // branchname2|created_at|modified_at|note2|
 // branchname|created_at|modified_at|note3|
 char* HashNote__serialize_table(HashNote_Table* table) {
-    // TODO: find better sane default, this is expensive
-    // It's also expensive to double it every time we need more, but may be OK
-    // It's just allocating way too much memory for the average usecase
     size_t buffer_size = (table->count * MAX_BRANCH_NAME_LENGTH) + (table->count * MAX_COMMENT_LENGTH * 2);
     size_t buffer_offset = 0;
     char* serialized_table_buffer = calloc(1, buffer_size);

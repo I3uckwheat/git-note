@@ -208,7 +208,7 @@ void parse_flags(int argc, char *argv[]) {
             case 'b': {
                 const char* branch_name = cag_option_get_value(&context);
                 strncpy(config.branch_name, branch_name, sizeof(config.branch_name));
-                break;;
+                break;
             }
 
             case 'c': {
