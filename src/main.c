@@ -49,7 +49,6 @@ static struct cag_option options[] = {
     .value_name = NULL,
     .description = "confirmation flag, used for deletions, see -d"},
 
-    // TODO: Set a -b for adding notes to other branches
     {.identifier = 'b',
     .access_letters = "b",
     .access_name = "branch",
