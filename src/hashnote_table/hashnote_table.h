@@ -10,11 +10,6 @@
 #define MAX_COMMENT_LENGTH 500
 #define MAX_COMMENTS_ON_BRANCH 300
 
-// Use this for refactoring maybe?
-// typedef struct {
-//     unsigned int index;
-//     HashNote_Note* note;
-// } HashNote_Note_Location;
 
 // Forward declaration for HashNote_Note
 typedef struct HashNote_Branch HashNote_Branch;
@@ -64,3 +59,5 @@ void HashNote__free_table(HashNote_Table* table);
 HashNote_Table* HashNote__deserialize(char* hash_note_string);
 char* HashNote__serialize_table(HashNote_Table* table);
 char* HashNote__serialize_branch(HashNote_Branch* branch);
+
+int HashNote_Table__sort_notes_by_entry_order_desc(HashNote_Table* table);

@@ -91,7 +91,13 @@ void setup_config() {
 
     char* retrieved = Storage__retrieve_serialized_table(config.repo_name);
     config.table = HashNote__deserialize(retrieved);
+    int result = HashNote_Table__sort_notes_by_entry_order_desc(config.table);
     free(retrieved);
+
+    if(result != 0) {
+        printf("Failed to sort table");
+        exit(1);
+    }
 }
 
 // TODO: if no note, open editor

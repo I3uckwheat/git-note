@@ -350,3 +350,28 @@ HashNote_Table* HashNote__deserialize(char* hash_note_string) {
 
     return table;
 }
+
+int HashNote_Table__sort_notes_by_entry_order_desc(HashNote_Table* table) {
+    size_t visited_count = 0;
+    for(size_t i = 0; i < table->size; i++) {
+        HashNote_Branch* branch = table->branches[i];
+        if(!branch) continue;
+        visited_count++;
+
+        size_t left = 0;
+        size_t right = branch->count - 1;
+        while (left < right) {
+            HashNote_Note* tmp = branch->notes[left];
+            branch->notes[left] = branch->notes[right];
+            branch->notes[right] = tmp;
+
+
+            size_t tmp_id = branch->notes[left]->id;
+            branch->notes[left]->id = branch->notes[right]->id;
+            branch->notes[right]->id = tmp_id;
+            left++;
+            right--;
+        }
+    }
+    return 0;
+}
