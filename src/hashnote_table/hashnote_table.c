@@ -288,6 +288,7 @@ char* HashNote__serialize_branch(HashNote_Branch* branch) {
     return serialized_branch;
 }
 
+// TODO: convert to using strtok
 void HashNote__deserialize_note(HashNote_Table* table, char* note_line_ptr) {
     char branch_name[256]; 
     memset(branch_name, '\0', sizeof(branch_name));

@@ -1,7 +1,6 @@
 #include "display_notes.h"
 #include "hashnote_table.h"
 
-// FIXME: return an int for success/fail
 void Display__list_branches(const HashNote_Table* table) { 
     HashNote_Branch** branches = HashNote__get_all_branches(table);
 
@@ -13,7 +12,6 @@ void Display__list_branches(const HashNote_Table* table) {
     }
 }
 
-// FIXME: return an int for success/fail
 void Display__list_notes(const HashNote_Table* table, const char* branch_name) {
     HashNote_Branch* branch = HashNote__get_branch(table, branch_name);
     if(!branch) {
@@ -22,9 +20,24 @@ void Display__list_notes(const HashNote_Table* table, const char* branch_name) {
     }
 
     printf("id | note\n");
-    printf("-----------\n");
+    printf("---------\n");
     for(size_t i = 0; i < branch->count; i++) {
         HashNote_Note* note = branch->notes[i];
-        printf(" %li | %s\n", note->id, note->text);
+
+        char* text_copy = strdup(note->text);
+        if(!text_copy) {
+            printf("Failed to dupe string\n");
+            exit(1);
+        }
+
+        char* rest = text_copy;
+        char* line = strtok_r(rest, "\n", &rest);
+        printf(" %li | %s\n", note->id, line);
+
+        while((line = strtok_r(rest, "\n", &rest))) {
+            printf("     %s\n", line);
+        }
+
+        free(text_copy);
     }
 }
