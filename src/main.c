@@ -100,7 +100,14 @@ void setup_config() {
 
 // TODO: if no note, open editor
 void add_note() {
-    HashNote__create_new_note(config.table, config.branch_name, config.added_note); 
+    const char* note_text;
+    if(!config.added_note) {
+        note_text = edit_with_git_editor("");
+    } else {
+        note_text = config.added_note;
+    }
+
+    HashNote__create_new_note(config.table, config.branch_name, note_text); 
     config.added_note = NULL;
     config.dirty = true;
 }
