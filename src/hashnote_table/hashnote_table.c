@@ -207,6 +207,7 @@ int HashNote_Table__delete_note(const HashNote_Table* table, const char* branch_
     return 0;
 }
 
+// TODO: add version number
 // v1
 // branchname|created_at|modified_at|note|
 // branchname2|created_at|modified_at|note2|

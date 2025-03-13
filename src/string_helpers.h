@@ -36,3 +36,19 @@ static inline int String__strntrim(char* buffer, char* string, size_t length) {
     buffer[end - start + 1] = '\0';
     return 0;
 }
+
+static inline int String__parse_note_id_string(const char* input) {
+    if(input == NULL) {
+        printf("Must enter a note_id: git-note [branch] [note id]\n");
+        exit(1);
+    }
+
+    const size_t note_id = (int)strtol(input, NULL, 10);
+
+    if(note_id == 0) {
+        printf("Invalid note id: %s\n", input);
+        exit(1);
+    }
+
+    return note_id;
+}

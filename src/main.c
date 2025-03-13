@@ -50,11 +50,11 @@ static struct cag_option options[] = {
     .description = "confirmation flag, used for deletions, see -d"},
 
     // TODO: Set a -b for adding notes to other branches
-    // {.identifier = 'c',
-    // .access_letters = NULL,
-    // .access_name = "confirm",
-    // .value_name = NULL,
-    // .description = "confirmation flag, used for deletions, see -d"},
+    {.identifier = 'b',
+    .access_letters = "b",
+    .access_name = "branch",
+    .value_name = "branch_name",
+    .description = "set the branch name for any operation, can be used to add notes to other branches"},
 };
 
 enum Operation {
@@ -145,20 +145,21 @@ void execute() {
     }
 }
 
-int main(int argc, char *argv[]) {
-    setup_config();
-
+void parse_flags(int argc, char *argv[]) {
     cag_option_context context;
     cag_option_init(&context, options, CAG_ARRAY_SIZE(options), argc, argv);
-    while(cag_option_fetch(&context)) { // NOTE: Using goto to break out of the loop and clean up on certain scenarios
-        switch(cag_option_get_identifier(&context)) {
+    while(cag_option_fetch(&context)) { 
+        char option_identifier = cag_option_get_identifier(&context);
+
+        // Only set these if we haven't set an operation yet
+        if(config.operation == None) {
+            switch (option_identifier) {
             case 'h': {
                 printf("Usage: git-note [OPTION]...\n");
                 cag_option_print(options, CAG_ARRAY_SIZE(options), stdout);
-                goto end;
+                break;
             }
 
-            // FIXME: When note file is empty or missing, we get a segfault
             case 'l': {
                 const char* branch_name = cag_option_get_value(&context);
                 if(!branch_name) {
@@ -167,15 +168,7 @@ int main(int argc, char *argv[]) {
                     config.operation = List_Branch;
                     strncpy(config.branch_name, branch_name, sizeof(config.branch_name));
                 }
-
-                goto end;
-            }
-
-            case 'a': {
-                config.operation = Add_Note;
-                const char* added_note = cag_option_get_value(&context);
-                config.added_note = added_note;
-                goto end;
+                break;
             }
 
             case 'e': {
@@ -184,21 +177,9 @@ int main(int argc, char *argv[]) {
                 strncpy(config.branch_name, branch_name, sizeof(config.branch_name));
 
                 char* note_id_string = argv[cag_option_get_index(&context)];
-                if(note_id_string == NULL) {
-                    printf("Must enter a note_id: git-note [branch] [note id]\n");
-                    goto end;
-                }
+                config.note_id = String__parse_note_id_string(note_id_string);
+                break;
 
-                const size_t note_id = (int)strtol(note_id_string, NULL, 10);
-
-                if(note_id == 0) {
-                    printf("Invalid note id: %s\n", note_id_string);
-                    goto end;
-                }
-
-                config.note_id = note_id;
-
-                goto end;
             }
 
             case 'd': {
@@ -207,35 +188,50 @@ int main(int argc, char *argv[]) {
                 strncpy(config.branch_name, branch_name, sizeof(config.branch_name));
 
                 char* note_id_string = argv[cag_option_get_index(&context)];
+                config.note_id = String__parse_note_id_string(note_id_string);
+                break;
+            }
 
-                if(note_id_string == NULL) {
-                    printf("Must enter a note_id: git-note [branch] [note id]\n");
-                    goto end;
-                }
+            case 'a': {
+                config.operation = Add_Note;
+                const char* added_note = cag_option_get_value(&context);
+                config.added_note = added_note;
+                break;
+            }
+            
+            default:
+                break;
+            }
+        }
 
-                const size_t note_id = (int)strtol(note_id_string, NULL, 10);
+        // These can be set anytime
+        switch(option_identifier) {
+            case 'b': {
+                const char* branch_name = cag_option_get_value(&context);
+                strncpy(config.branch_name, branch_name, sizeof(config.branch_name));
+                break;;
+            }
 
-                if(note_id == 0) {
-                    printf("Invalid note id: %s\n", note_id_string);
-                    goto end;
-                }
-
-                config.note_id = note_id;
-
-                delete_note();
-
-                goto end;
+            case 'c': {
+                config.confirmed = true;
+                break;
             }
 
             case '?': {
                 cag_option_print_error(&context, stdout);
-                return 1;
+                exit(1);
             }
         }
     }
+}
 
-    end:
-
-    execute();
+void cleanup() {
     free(config.table);
+}
+
+int main(int argc, char *argv[]) {
+    setup_config();
+    parse_flags(argc, argv);
+    execute();
+    cleanup();
 }
