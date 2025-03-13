@@ -1,6 +1,7 @@
 #include <time.h>
 
 #include "hashnote_table.h"
+#include "string_helpers.h"
 
 void HashNote__free_note(HashNote_Note* note) {
     if(note == NULL) return;
@@ -273,9 +274,14 @@ char* HashNote__serialize_branch(HashNote_Branch* branch) {
 
         // Adding to the string based on the offset
         // branch||created_at|modified_at|note\n
-        snprintf(serialized_branch + offset, MAX_COMMENT_LENGTH - 1, "%s|%lu|%lu|%s|\n", branch->name, note->created_at, note->modified_at, note->text);
+        size_t escaped_str_size = (strlen(note->text) * 2) + 1; // in case every char needs escaping
+        char* escaped_note_text = calloc(2, escaped_str_size);
+        String__escape_newlines(escaped_note_text, note->text, escaped_str_size);
+
+        snprintf(serialized_branch + offset, MAX_COMMENT_LENGTH - 1, "%s|%lu|%lu|%s|\n", branch->name, note->created_at, note->modified_at, escaped_note_text);
         offset = strlen(serialized_branch);
         remaining_space = total_size - offset;
+        free(escaped_note_text);
     }
 
     serialized_branch[total_size - 1] = '\0';  // Ensure null termination
@@ -305,12 +311,14 @@ void HashNote__deserialize_note(HashNote_Table* table, char* note_line_ptr) {
     modified_at = (time_t)parsed_modified_at;
     note_line_ptr++; // move past deliminator
 
-    // note text
-    char* note_text_end_ptr = strchr(note_line_ptr, '|');
+    char* note_text_end_ptr = strstr(note_line_ptr, "|\n");
+    if(note_text_end_ptr == NULL) {
+        note_text_end_ptr = note_line_ptr + strlen(note_line_ptr);
+    }
 
     size_t note_length = note_text_end_ptr - note_line_ptr;
-    char* note_text = calloc(1, note_length + 1);
-    strncpy(note_text, note_line_ptr, note_length);
+    char* note_text = calloc(1, note_length + 1); // to help unescape
+    String__unescape_newlines_n(note_text, note_line_ptr, note_length);
     note_text[note_length] = '\0';
 
     HashNote__create_note_on_table(table, branch_name, created_at, modified_at, note_text);
