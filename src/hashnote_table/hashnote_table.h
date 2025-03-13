@@ -5,9 +5,9 @@
 #include <string.h>
 #include <time.h>
 
-#define TABLE_CAPACITY 5000 // TODO: Figure out sane max
+#define TABLE_CAPACITY 500 // TODO: Figure out sane max
 #define MAX_BRANCH_NAME_LENGTH 200
-#define MAX_COMMENT_LENGTH 256
+#define MAX_COMMENT_LENGTH 500
 #define MAX_COMMENTS_ON_BRANCH 300
 
 // Use this for refactoring maybe?

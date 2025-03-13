@@ -1,3 +1,4 @@
+#include <time.h>
 #include "display_notes.h"
 #include "hashnote_table.h"
 
@@ -58,6 +59,19 @@ void Display__list_notes(const HashNote_Table* table, const char* branch_name) {
     }
 }
 
-// void Display__show_note() {
+void Display__note(const HashNote_Table* table, const char* branch_name, const size_t note_id) {
+    const HashNote_Note* note = HashNote__get_note(table, branch_name, note_id);
 
-// }
+    char created_at[26];
+    char modified_at[26];
+    ctime_r(&note->created_at, created_at);
+    ctime_r(&note->modified_at, modified_at);
+
+    // ctime ends with a newline, this strips it out
+    created_at[strlen(created_at) - 1] = '\0';
+    modified_at[strlen(modified_at) - 1] = '\0';
+
+    printf("id: %lu | Created: %s | Modified: %s\n", note->id, created_at, modified_at);
+    printf("----------------------------------------------------------------------------\n");
+    printf("%s\n", note->text);
+}

@@ -34,13 +34,13 @@ static struct cag_option options[] = {
     {.identifier = 'e',
     .access_letters = "e",
     .access_name = "edit",
-    .value_name = "note",
+    .value_name = "note_id",
     .description = "edit a note 'git-note -e [branch] [note id]`"},
 
     {.identifier = 'd',
     .access_letters = "d",
     .access_name = "delete",
-    .value_name = "note",
+    .value_name = "note_id",
     .description = "delete a note 'git-note -d [branch] [note id]` or omit note id for branch deletion (need to pass --confirm for confirmation)"},
 
     {.identifier = 'c',
@@ -65,6 +65,7 @@ enum Operation {
     Delete_Branch,
     List_Branch,
     List_All,
+    Show_Note,
 };
 
 typedef struct Config {
@@ -122,6 +123,9 @@ void execute() {
             break;
         case List_Branch:
             Display__list_notes(config.table, config.branch_name);
+            break;
+        case Show_Note:
+            Display__note(config.table, config.branch_name, config.note_id);
             break;
         case Add_Note:
             add_note();
@@ -228,16 +232,26 @@ void parse_flags(int argc, char *argv[]) {
     // TODO: second parameter displays note details
     if(config.operation == None) {
         int param_index = 0;
-        param_index = cag_option_get_index(&context);
 
         // first param is branch
+        param_index = cag_option_get_index(&context);
         char* branch_name = argv[param_index];
-        if(branch_name) {
+
+        // Second is note_id
+        param_index++;
+        char* note_id_str = argv[param_index];
+
+        if(branch_name && note_id_str) {
+            config.operation = Show_Note;
+            strncpy(config.branch_name, branch_name, sizeof(config.branch_name));
+            config.note_id = String__parse_note_id_string(note_id_str);
+        } else if(branch_name) {
             strncpy(config.branch_name, branch_name, sizeof(config.branch_name));
             config.operation = List_Branch;
         } else {
             config.operation = List_All;
         }
+
     }
 }
 
