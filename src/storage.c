@@ -60,6 +60,8 @@ char* Storage__retrieve_serialized_table(char* repo_name) {
     Storage__build_note_file_path(note_file_path, sizeof(note_file_path), root_note_directory, repo_name);
 
     FILE* notes_file = fopen(note_file_path, "r");
-    return read_file_into_memory(notes_file);
+    if(!notes_file) return NULL;
+    char* file_content = read_file_into_memory(notes_file);
     fclose(notes_file);
+    return file_content;
 }

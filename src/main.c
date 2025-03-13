@@ -90,11 +90,14 @@ void setup_config() {
     GitHelpers__get_branch_name(config.branch_name, sizeof(config.branch_name));
 
     char* retrieved = Storage__retrieve_serialized_table(config.repo_name);
-    config.table = HashNote__deserialize(retrieved);
-    free(retrieved);
+    if(retrieved != NULL)  {
+        config.table = HashNote__deserialize(retrieved);
+        free(retrieved);
+    } else {
+        config.table = HashNote__create_table();
+    }
 }
 
-// TODO: Ensure new notes are added as number 1
 // TODO: if no note, open editor
 void add_note() {
     HashNote__create_new_note(config.table, config.branch_name, config.added_note); 
