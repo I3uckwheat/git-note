@@ -98,7 +98,6 @@ void setup_config() {
     }
 }
 
-// TODO: if no note, open editor
 void add_note() {
     const char* note_text;
     if(!config.added_note) {
