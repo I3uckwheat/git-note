@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -11,7 +12,7 @@ int GitHelpers__get_branch_name(char *buffer, size_t bufferSize) {
         return 1;
     }
 
-    while(fgets(buffer, bufferSize, fp) != NULL);
+    while(fgets(buffer, bufferSize, fp) != NULL); 
     buffer[strcspn(buffer, "\n")] = 0; // Removes the newline returned from the git command
 
     // Converts all '/' into another delimiter
@@ -26,6 +27,7 @@ int GitHelpers__get_branch_name(char *buffer, size_t bufferSize) {
 }
 
 int GitHelpers__get_dir_name(char *buffer, size_t bufferSize) {
+    buffer[0] = '\0'; // ensuring we don't read garbage on the buffer check
     FILE *fp;
     fp = popen("git rev-parse --show-toplevel", "r");
     if(fp == NULL) {
@@ -35,6 +37,10 @@ int GitHelpers__get_dir_name(char *buffer, size_t bufferSize) {
 
     while(fgets(buffer, bufferSize, fp) != NULL);
     pclose(fp);
+
+    if(buffer[0] == '\0') {
+        exit(1); // Git prints the error for us
+    }
 
     buffer[strcspn(buffer, "\n")] = 0; // Removes the newline returned from the git command
     memcpy(buffer, strrchr(buffer, '/') + 1, bufferSize); // Move the substring to the front of the buffer
