@@ -178,10 +178,18 @@ void parse_flags(int argc, char *argv[]) {
 
             case 'l': {
                 const char* branch_name = cag_option_get_value(&context);
+
                 if(!branch_name) {
                     config.operation = List_All;
                 } else {
-                    config.operation = List_Branch;
+                    int param_index = cag_option_get_index(&context);
+                    char* note_id_str = argv[param_index];
+                    if(note_id_str) {
+                        config.note_id = String__parse_note_id_string(note_id_str);
+                        config.operation = Show_Note;
+                    } else {
+                        config.operation = List_Branch;
+                    }
                     strncpy(config.branch_name, branch_name, sizeof(config.branch_name));
                 }
                 break;
@@ -199,6 +207,7 @@ void parse_flags(int argc, char *argv[]) {
             }
 
             case 'd': {
+                // Add confirmation and support for deleting a branch
                 config.operation = Delete_Note;
                 const char* branch_name = cag_option_get_value(&context);
                 strncpy(config.branch_name, branch_name, sizeof(config.branch_name));
