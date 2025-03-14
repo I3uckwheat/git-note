@@ -1,8 +1,9 @@
-Git Note
+# Git Note
+
 A simple program to take notes alongside the famous `git` software!
 
 
-# Example 
+## Example 
 (while on branch main)
 
 ```
@@ -33,7 +34,7 @@ id | note
 
 ```
 
-# Compiling
+## Compiling
 
 This should all be done from the root directory of this repo
 
@@ -46,7 +47,7 @@ make
 
 This will create a binary called `git-note`, you can show the help by typing `./git-note --help`. Running this binary will create a directory in your HOME directory called `.git-note`
 
-# Usage
+## Usage
 
 ```
 git-note [flags] [branch] [note id]
